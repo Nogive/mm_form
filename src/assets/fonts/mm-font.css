@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: 'mm-font';
+  src: url('./iconfont.ttf') format('truetype');;
+}
+.van-icon{
+  font-family: 'vant-icon', 'mm-font' !important;
+}
+.van-icon-pullDown:before { content: "\e6b9"; }
+
+.van-icon-pullUp:before { content: "\e60d"; }
