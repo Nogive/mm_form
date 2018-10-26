@@ -25,9 +25,9 @@ export default {
 
   data () {
     return {
-      // defaultConfig: { // your config's default value（Note: use mergeConfig when use config value）
-      //   msg: 'mm input'
-      // }
+      defaultConfig: { 
+        step: 1
+      }
     }
   },
 

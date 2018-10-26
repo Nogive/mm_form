@@ -13,6 +13,7 @@ import mmTextarea from "@/components/controls/mmTextarea";
 import mmRadio from "@/components/controls/mmRadio";
 import mmCheckbox from "@/components/controls/mmCheckbox";
 import mmSelect from "@/components/controls/mmSelect";
+import mmArea from "@/components/controls/mmArea";
 import mmDatePicker from "@/components/controls/mmDatePicker";
 import mmTimePicker from "@/components/controls/mmTimePicker";
 import mmPullSelect from "@/components/controls/mmPullSelect";
@@ -20,6 +21,7 @@ import mmMulSelect from "@/components/controls/mmMulSelect";
 import mmPhoto from "@/components/controls/mmPhoto";
 import mmLocation from "@/components/controls/mmLocation";
 import mmObject from "@/components/controls/mmObject";
+import mmArray from "@/components/controls/mmArray";
 
 Vue.use(vueNcform, { 
   extComponents: {  
@@ -29,12 +31,14 @@ Vue.use(vueNcform, {
     mmRadio,
     mmCheckbox,
     mmSelect,
+    mmArea,
     mmDatePicker,
     mmTimePicker,
     mmPullSelect,
     mmMulSelect,
     mmPhoto,
     mmObject,
+    mmArray,
     mmLocation
   } 
 });
@@ -99,7 +103,7 @@ const userSchema={
     showLegend:true,
     label:'object',
     legend:'SKU配置表',
-    widget: 'mm-object',
+    widget: 'mm-array',
     widgetConfig: {
       collapsed: false
     }

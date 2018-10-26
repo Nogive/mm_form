@@ -1,5 +1,5 @@
 <template>
-  <div class="select" v-show="!hidden" >
+  <div class="select space" v-show="!hidden" >
     <div class="single-wrapper">
       <div class="select-header" @click="expandOptions">
         <div class="input-wrapper">

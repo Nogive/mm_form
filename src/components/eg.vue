@@ -42,30 +42,6 @@ export default {
               widget:'mm-radio'
             }
           },
-          check:{
-            type:'array',
-            ui:{
-              label:'checkbox 多选',
-              hidden:'dx:{{$root.ok}}',
-              widget:'mm-checkbox',
-              widgetConfig:{
-                enumSource:[
-                  {
-                    value:1,
-                    label:'red'
-                  },
-                  {
-                    value:2,
-                    label:'green'
-                  },
-                  {
-                    value:3,
-                    label:'blue'
-                  },
-                ]
-              }
-            }
-          },
           select:{
             type:'array',
             ui:{
@@ -98,70 +74,7 @@ export default {
                 type:'date',
               }
             }
-          },
-          time:{
-            type:'string',
-            ui:{
-              label:'timePicker 时间选择器',
-              widget:'mm-time-picker',
-            }
-          },
-          pullselect:{
-            type:'string',
-            value:'2',
-            ui:{
-              label:'select 下拉框选择器',
-              widget:'mm-pull-select',
-              widgetConfig:{
-                enumSource:[
-                  {
-                    value:1,
-                    label:'选项1'
-                  },
-                  {
-                    value:2,
-                    label:'选项2'
-                  },
-                  {
-                    value:3,
-                    label:'选项3'
-                  },
-                ]
-              }
-            }
-          },
-          mulselect:{
-            type:'array',
-            value:[1,3,4],
-            ui:{
-              label:'select 多选下拉框选择器',
-              widget:'mm-mul-select',
-              widgetConfig:{
-                enumSource:[
-                  {
-                    value:1,
-                    label:'多选1'
-                  },
-                  {
-                    value:2,
-                    label:'多选2'
-                  },
-                  {
-                    value:3,
-                    label:'多选3'
-                  },
-                  {
-                    value:4,
-                    label:'多选4'
-                  },
-                  {
-                    value:5,
-                    label:'多选5'
-                  }
-                ]
-              }
-            }
-          },
+          }
         }
       }
     }

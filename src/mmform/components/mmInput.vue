@@ -1,14 +1,12 @@
 <template>
   <div class="space">
     <!-- <label>{{mergeConfig.msg}}</label> -->
-
-    <!-- disabled / readonly / placeholder / hidden : use the computed version, not the config version. defined in controlMixin -->
-    <!-- modelVal: for binding value. defined in controlMixin -->
     <van-cell-group>
       <van-field 
         :disabled="disabled"
         :readonly="readonly"
         :placeholder="placeholder"
+        :type="mergeConfig.type"
         v-show="!hidden"
         v-model="modelVal"
        />
@@ -31,9 +29,9 @@ export default {
 
   data () {
     return {
-      // defaultConfig: { // your config's default value（Note: use mergeConfig when use config value）
-      //   msg: 'mm input'
-      // }
+      defaultConfig: { 
+        type: 'text'
+      }
     }
   },
 

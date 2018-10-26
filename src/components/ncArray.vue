@@ -12,9 +12,11 @@ import mmNumber from "@/components/controls/mmNumber";
 import mmTextarea from "@/components/controls/mmTextarea";
 import mmDatePicker from "@/components/controls/mmDatePicker";
 import mmSelect from "@/components/controls/mmSelect";
+import mmArea from "@/components/controls/mmArea";
 import mmPhoto from "@/components/controls/mmPhoto";
 import mmLocation from "@/components/controls/mmLocation";
 import mmObject from "@/components/controls/mmObject";
+import mmArray from "@/components/controls/mmArray";
 Vue.use(vueNcform, { 
   extComponents: {  
     mmInput,
@@ -22,14 +24,17 @@ Vue.use(vueNcform, {
     mmTextarea,
     mmDatePicker,
     mmSelect,
+    mmArea,
     mmPhoto,
     mmObject,
-    mmLocation
+    mmLocation,
+    mmArray
   } 
 });
 
 import {radioRule} from "@/components/rules"
 Vue.use(vueNcform, { extRules: [{myCustom:radioRule}] });
+import areaList from "./data/area"
 
 const userSchema={
   type: "array",
@@ -89,11 +94,71 @@ const userSchema={
   },
   ui: {
     showLegend:true,
-    label:'object',
+    label:'array 子表',
     legend:'SKU配置表',
-    widget: 'mm-object',
+    widget: 'mm-array',
     widgetConfig: {
       collapsed: false
+    }
+  }
+};
+const objectSchema={
+  type: "object",
+  properties:{
+    name: {
+      type: 'string',
+      ui: {
+        label:'Input 输入框',
+        widget: 'mm-input',
+        placeholder:'请输入姓名'
+      }
+    },
+    count:{
+      type:'number',
+      ui:{
+        label:'input-number 计数',
+        widget:'mm-number'
+      }
+    },
+    ok:{
+      type:'boolean',
+      ui:{
+        label:'radio 是否',
+        widget:'mm-radio'
+      }
+    },
+    pullselect:{
+      type:'string',
+      value:'2',
+      ui:{
+        label:'select 下拉框选择器',
+        widget:'mm-select',
+        widgetConfig:{
+          enumSource:[
+            {
+              value:1,
+              label:'选项1'
+            },
+            {
+              value:2,
+              label:'选项2'
+            },
+            {
+              value:3,
+              label:'选项3'
+            },
+          ]
+        }
+      }
+    }
+  },
+  ui: {
+    showLegend:true,
+    label:'object 对象',
+    legend:'这是object 标题',
+    widget: 'mm-object',
+    widgetConfig: {
+      collapsed: false,
     }
   }
 };
@@ -237,6 +302,22 @@ export default {
               }
             }
           },
+          area: {
+            type: 'string',
+            value:'120000',
+            ui: {
+              label:'area 选择省市区',
+              readonly:true,
+              widget: 'mm-area',
+              widgetConfig:{
+                areaList:areaList,
+                columns:2,
+                clearable:true
+              }
+            }
+          },
+          array:userSchema,
+          object:objectSchema
         }
       }
     }

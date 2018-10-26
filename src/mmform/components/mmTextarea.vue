@@ -8,8 +8,8 @@
         v-show="!hidden"
         v-model="modelVal"
         type="textarea"
-        rows="1"
-        autosize
+        :rows="mergeConfig.rows"
+        :autosize="mergeConfig.autosize"
       />
     </van-cell-group>
   </div>
@@ -29,9 +29,10 @@ export default {
 
   data () {
     return {
-      // defaultConfig: { // your config's default value（Note: use mergeConfig when use config value）
-      //   msg: 'mm input'
-      // }
+      defaultConfig: {
+        rows: 2,
+        autosize:false
+      }
     }
   },
 

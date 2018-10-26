@@ -2,9 +2,9 @@
   <div class="space">
     <van-switch 
       v-model="modelVal"
-      :disabled="disabled"
-      v-show="!hidden && !readonly"
-      size="30px"
+      v-show="!hidden"
+      :disabled="readonly"
+      :size="mergeConfig.size"
      />
   </div>
 </template>
@@ -15,17 +15,15 @@
 </style>
 
 <script>
-
 import ncformCommon from '@ncform/ncform-common'
-
 export default {
   mixins: [ncformCommon.mixins.vue.controlMixin],
 
   data () {
     return {
-      // defaultConfig: { // your config's default value（Note: use mergeConfig when use config value）
-      //   msg: 'mm input'
-      // }
+      defaultConfig: { // your config's default value（Note: use mergeConfig when use config value）
+        size: '30px'
+      }
     }
   },
 
