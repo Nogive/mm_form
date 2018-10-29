@@ -86,7 +86,7 @@ const objectSchema={
         label:'Input 输入框',
         widget: 'mm-input',
         placeholder:'请输入姓名'
-      }
+      },
     },
     count:{
       type:'number',
@@ -153,9 +153,8 @@ const formSchema={
         }
       },
       rules:{
-        required:{
+        myCustom:{
           value:true,
-          errMsg:'必填'
         }
       }
     },
@@ -338,7 +337,7 @@ export default {
       this.isSchemaChanging=true;
       let schema=this.formSchema.properties;
       this.$nextTick(() => {
-        this.recusiveReadOnly(schema,true);
+        this.recursiveReadOnly(schema,true);
         this.isSchemaChanging=false;
       });
     },

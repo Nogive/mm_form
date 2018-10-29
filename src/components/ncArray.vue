@@ -368,22 +368,22 @@ export default {
       this.isSchemaChanging=true;
       let schema=this.formSchema.properties;
       this.$nextTick(() => {
-        recusiveReadOnly(schema,true);
+        recursiveReadOnly(schema,true);
         this.isSchemaChanging=false;
       });
     }
   }
 }
-function recusiveReadOnly(schema,readonly){
+function recursiveReadOnly(schema,readonly){
   for(var o in schema){
     let childFiled=schema[o];
     if(childFiled.layoutType=="array"){
       childFiled.ui.readonly=readonly;
       let arraySchema=childFiled.items.properties;
-      recusiveReadOnly(arraySchema,readonly);
+      recursiveReadOnly(arraySchema,readonly);
     }else if(childFiled.layoutType=="object"){
       let objectSchema=childFiled.properties;
-      recusiveReadOnly(objectSchema,readonly);
+      recursiveReadOnly(objectSchema,readonly);
     }else{
       childFiled.ui.readonly=readonly;
     }
