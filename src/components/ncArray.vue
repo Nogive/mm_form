@@ -45,7 +45,7 @@ var data={
   note:'啦啦啦',
   ok:false,
   count:3,
-  date:"1540778921000",
+  date:1540778921000,
   area:'120000',
   select:3,
   array:[
@@ -269,7 +269,7 @@ export default {
             }
           },
           date:{
-            type:'string',
+            type:'number',
             ui:{
               label:'dataPicker 日期选择器',
               readonly:false,
@@ -359,7 +359,7 @@ export default {
       })
     },
     setValue(){
-      
+      this.formSchema.value=data;
     }
   }
 }

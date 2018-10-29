@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     _processModelVal (modelVal) {
-      return modelVal.toString();
+      return modelVal;
     },
     _setInitVal(){
       if(this.value){
