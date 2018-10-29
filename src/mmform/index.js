@@ -26,3 +26,20 @@ Vue.use(vueNcform, {
     mmArea
   }
 });
+//set readonly
+function recusiveReadOnly(schema, readonly) {
+  for (var o in schema) {
+    let childFiled = schema[o];
+    if (childFiled.layoutType == "array") {
+      childFiled.ui.readonly = readonly;
+      let arraySchema = childFiled.items.properties;
+      recusiveReadOnly(arraySchema, readonly);
+    } else if (childFiled.layoutType == "object") {
+      let objectSchema = childFiled.properties;
+      recusiveReadOnly(objectSchema, readonly);
+    } else {
+      childFiled.ui.readonly = readonly;
+    }
+  }
+}
+Vue.prototype.recusiveReadOnly = recusiveReadOnly;

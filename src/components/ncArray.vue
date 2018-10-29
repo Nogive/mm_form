@@ -1,14 +1,14 @@
 <template>
   <div class="input-box">
-    <ncform :form-schema="formSchema" form-name="mm-form" v-model="formSchema.value"></ncform>
+    <ncform v-if="!isSchemaChanging" :form-schema="formSchema" form-name="mm-form" v-model="formSchema.value"></ncform>
     <van-button size="small" @click="submit()">Submit</van-button>
     <van-button size="small" @click="setValue()">set value to schema</van-button>
+    <van-button size="small" @click="setReadonly">set readonly</van-button>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import vueNcform from "@ncform/ncform";
-import ncformCommon from '@ncform/ncform-common';
 import mmInput from "@/components/controls/mmInput";
 import mmNumber from "@/components/controls/mmNumber";
 import mmTextarea from "@/components/controls/mmTextarea";
@@ -33,11 +33,7 @@ Vue.use(vueNcform, {
     mmArray
   } 
 });
-import _cloneDeep from 'lodash-es/cloneDeep';
-const ncformUtils = ncformCommon.ncformUtils;
 
-import {radioRule} from "@/components/rules"
-Vue.use(vueNcform, { extRules: [{myCustom:radioRule}] });
 import areaList from "./data/area"
 
 var data={
@@ -66,6 +62,7 @@ var data={
 
 const userSchema={
   type: "array",
+  layoutType:'array',
   items: {
     type: "object",
     properties:{
@@ -132,6 +129,7 @@ const userSchema={
 };
 const objectSchema={
   type: "object",
+  layoutType:'object',
   properties:{
     name: {
       type: 'string',
@@ -178,7 +176,8 @@ const objectSchema={
           ]
         }
       }
-    }
+    },
+    array:userSchema
   },
   ui: {
     showLegend:true,
@@ -199,9 +198,9 @@ export default {
         properties: {
           name: {
             type: 'string',
+            layoutType:'normal',
             ui: {
               label:'Input 姓名',
-              readonly:false,
               placeholder:'请输入姓名',
               widget: 'mm-input',
               widgetConfig:{
@@ -217,9 +216,9 @@ export default {
           },
           count:{
             type:'number',
+            layoutType:'normal',
             ui:{
               label:'input-number 计数',
-              readonly:false,
               widget:'mm-number',
               widgetConfig:{
                 step:0.2,
@@ -236,9 +235,9 @@ export default {
           },
           note:{
             type:'string',
+            layoutType:'normal',
             ui:{
               label:'textarea 多行文本',
-              readonly:false,
               placeholder:'在这里输入备注或留言',
               widget:'mm-textarea',
               widgetConfig:{
@@ -255,7 +254,7 @@ export default {
           },
           ok:{
             type:'boolean',
-            value:true,
+            layoutType:'normal',
             ui:{
               label:'radio 是否',
               readonly:false,
@@ -270,6 +269,7 @@ export default {
           },
           date:{
             type:'number',
+            layoutType:'normal',
             ui:{
               label:'dataPicker 日期选择器',
               readonly:false,
@@ -287,6 +287,7 @@ export default {
           },
           select:{
             type:'array',
+            layoutType:'normal',
             value:3,
             ui:{
               label:'select 单选 多选下拉框选择器',
@@ -332,6 +333,7 @@ export default {
           },
           area: {
             type: 'string',
+            layoutType:'normal',
             value:'120000',
             ui: {
               label:'area 选择省市区',
@@ -347,7 +349,8 @@ export default {
           array:userSchema,
           object:objectSchema
         }
-      }
+      },
+      isSchemaChanging:false
     }
   },
   methods: {
@@ -358,8 +361,31 @@ export default {
         }
       })
     },
-    setValue(){
+    setValue(){//设置值
       this.formSchema.value=data;
+    },
+    setReadonly(){//设置readonly
+      this.isSchemaChanging=true;
+      let schema=this.formSchema.properties;
+      this.$nextTick(() => {
+        recusiveReadOnly(schema,true);
+        this.isSchemaChanging=false;
+      });
+    }
+  }
+}
+function recusiveReadOnly(schema,readonly){
+  for(var o in schema){
+    let childFiled=schema[o];
+    if(childFiled.layoutType=="array"){
+      childFiled.ui.readonly=readonly;
+      let arraySchema=childFiled.items.properties;
+      recusiveReadOnly(arraySchema,readonly);
+    }else if(childFiled.layoutType=="object"){
+      let objectSchema=childFiled.properties;
+      recusiveReadOnly(objectSchema,readonly);
+    }else{
+      childFiled.ui.readonly=readonly;
     }
   }
 }
