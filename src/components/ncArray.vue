@@ -2,11 +2,13 @@
   <div class="input-box">
     <ncform :form-schema="formSchema" form-name="mm-form" v-model="formSchema.value"></ncform>
     <van-button size="small" @click="submit()">Submit</van-button>
+    <van-button size="small" @click="setValue()">set value to schema</van-button>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import vueNcform from "@ncform/ncform";
+import ncformCommon from '@ncform/ncform-common';
 import mmInput from "@/components/controls/mmInput";
 import mmNumber from "@/components/controls/mmNumber";
 import mmTextarea from "@/components/controls/mmTextarea";
@@ -31,10 +33,36 @@ Vue.use(vueNcform, {
     mmArray
   } 
 });
+import _cloneDeep from 'lodash-es/cloneDeep';
+const ncformUtils = ncformCommon.ncformUtils;
 
 import {radioRule} from "@/components/rules"
 Vue.use(vueNcform, { extRules: [{myCustom:radioRule}] });
 import areaList from "./data/area"
+
+var data={
+  name:'cd',
+  note:'啦啦啦',
+  ok:false,
+  count:3,
+  date:"1540778921000",
+  area:'120000',
+  select:3,
+  array:[
+    {
+      count:2,
+      name:'ccd',
+      ok:true,
+      pullselect:2
+    }
+  ],
+  object:{
+    count:4,
+    name:'cccd',
+    ok:false,
+    pullselect:2
+  }
+}
 
 const userSchema={
   type: "array",
@@ -329,6 +357,9 @@ export default {
           console.log(this.$data.formSchema.value)
         }
       })
+    },
+    setValue(){
+      
     }
   }
 }
