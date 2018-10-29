@@ -43,7 +43,9 @@ export default {
   },
   computed:{
     showTakePhoto:function(){
-      if(this.value.length<maxLen){
+      if(this.readonly){
+        return false;
+      }else if(this.value.length<maxLen){
         return true;
       }else{
         return false;

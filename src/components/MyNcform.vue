@@ -238,6 +238,7 @@ export default {
             ],
             ui:{
               label:'photo 拍照',
+              readonly:false,
               widget:'mm-photo',
             }
           },
@@ -245,6 +246,7 @@ export default {
             type:'Object',
             ui:{
               label:'定位',
+              readonly:false,
               widget:'mm-location'
             }
           },

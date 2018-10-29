@@ -8,7 +8,7 @@
         rows="1"
         autosize
         readonly
-        icon="location"
+        :icon="locationIcon"
         @click-icon="onLocation"
         @click="showMapContent"/>
     </van-cell-group>
@@ -67,6 +67,15 @@ export default {
       this.modelVal=this.center;
     }
   },
+  computed:{
+    locationIcon:function(){
+      if(this.readonly){
+        return "";
+      }else{
+        return "location"
+      }
+    }
+  },
   methods: {
      _processModelVal (modelVal) {
       return modelVal;
@@ -119,12 +128,14 @@ export default {
       });
     },
     showMapContent(){
-      if(this.address!=""){
-        this.showMap=true;
-        this.$nextTick(()=>{
-          this._initMap();
-          this.onDrag();
-        })
+      if(!this.readonly){
+        if(this.address!=""){
+          this.showMap=true;
+          this.$nextTick(()=>{
+            this._initMap();
+            this.onDrag();
+          })
+        }
       }
     },
     onSearch(){
