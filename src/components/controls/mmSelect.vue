@@ -16,7 +16,7 @@
           @keyup="filterSearch">
         <i class="icon pullup" v-if="expand"></i>
         <i class="icon pulldown" v-else></i>
-        <i class="icon clear" v-show="inputText&&mergeConfig.clearable&&!mergeConfig.multiple" @click.stop="clearOptions"></i>
+        <i class="icon clear" v-show="inputText && mergeConfig.clearable && !mergeConfig.multiple && !readonly" @click.stop="clearOptions"></i>
       </div>
     </div>
     <transition name="slide">

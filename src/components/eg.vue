@@ -1,6 +1,6 @@
 <template>
   <div class="input-box">
-    <ncform v-if="!isSchemaChanging" :form-schema="formSchema" form-name="your-form-name" v-model="formSchema.value"></ncform>
+    <ncform v-if="!isSchemaChanging" :form-schema="formSchema" form-name="formSchema" v-model="formSchema.value"></ncform>
     <van-button size="small" @click="submit()">Submit</van-button>
     <van-button size="small" @click="setValue()">setValue</van-button>
     <van-button size="small" @click="setReadonly()">setReadonly</van-button>
@@ -11,7 +11,6 @@ import "@/mmform/index";
 import areaList from "./data/area"
 const userSchema={
   type: "array",
-  layoutType:'array',
   items: {
     type: "object",
     properties:{
@@ -42,7 +41,7 @@ const userSchema={
         value:'2',
         ui:{
           label:'select 下拉框选择器',
-          widget:'mm-pull-select',
+          widget:'mm-select',
           widgetConfig:{
             enumSource:[
               {
@@ -77,8 +76,8 @@ const userSchema={
   }
 };
 const objectSchema={
+  id:1,
   type: "object",
-  layoutType:'object',
   properties:{
     name: {
       type: 'string',
@@ -125,8 +124,7 @@ const objectSchema={
           ]
         }
       }
-    },
-    array:userSchema
+    }
   },
   ui: {
     showLegend:true,
@@ -143,7 +141,6 @@ const formSchema={
   properties: {
     name: {
       type: 'string',
-      layoutType:'normal',
       ui: {
         label:'Input 姓名',
         placeholder:'请输入姓名',
@@ -160,7 +157,6 @@ const formSchema={
     },
     count:{
       type:'number',
-      layoutType:'normal',
       ui:{
         label:'input-number 计数',
         widget:'mm-number',
@@ -179,7 +175,6 @@ const formSchema={
     },
     note:{
       type:'string',
-      layoutType:'normal',
       ui:{
         label:'textarea 多行文本',
         placeholder:'在这里输入备注或留言',
@@ -198,7 +193,6 @@ const formSchema={
     },
     ok:{
       type:'boolean',
-      layoutType:'normal',
       ui:{
         label:'radio 是否',
         readonly:false,
@@ -213,7 +207,6 @@ const formSchema={
     },
     date:{
       type:'number',
-      layoutType:'normal',
       ui:{
         label:'dataPicker 日期选择器',
         readonly:false,
@@ -231,7 +224,6 @@ const formSchema={
     },
     select:{
       type:'array',
-      layoutType:'normal',
       value:3,
       ui:{
         label:'select 单选 多选下拉框选择器',
@@ -277,7 +269,6 @@ const formSchema={
     },
     area: {
       type: 'string',
-      layoutType:'normal',
       value:'120000',
       ui: {
         label:'area 选择省市区',
@@ -327,9 +318,15 @@ export default {
   },
   methods: {
     submit () {
-      this.$ncformValidate('your-form-name').then(data => {
+      this.$ncformValidate('formSchema').then(data => {
         if (data.result) {
-          console.log(this.$data.formSchema.value)
+          let params={
+            systemSchemaId:1,
+            systemSchemaVersion:1,
+            systemCreatorUserId:1,
+            formData:this.$data.formSchema.value
+          };
+          console.log(params)
         }
       })
     },

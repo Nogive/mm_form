@@ -49,11 +49,11 @@ Vue.use(vueNcform, {
 function recursiveReadOnly(schema, readonly) {
   for (var o in schema) {
     let childFiled = schema[o];
-    if (childFiled.layoutType == "array") {
+    if (childFiled.ui.widget == "mm-array") {
       childFiled.ui.readonly = readonly;
       let arraySchema = childFiled.items.properties;
       recursiveReadOnly(arraySchema, readonly);
-    } else if (childFiled.layoutType == "object") {
+    } else if (childFiled.ui.widget == "mm-object") {
       let objectSchema = childFiled.properties;
       recursiveReadOnly(objectSchema, readonly);
     } else {
