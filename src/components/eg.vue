@@ -281,7 +281,7 @@ const formSchema={
       value:'120000',
       ui: {
         label:'area 选择省市区',
-        readonly:true,
+        readonly:false,
         widget: 'mm-area',
         widgetConfig:{
           areaList:areaList,

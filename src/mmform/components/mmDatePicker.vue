@@ -11,6 +11,7 @@
       @click="ToggleDatwPicker">
 
     <van-datetime-picker
+      class="picker-box"
       v-show="show"
       v-model="dateVal"
       :type="mergeConfig.type"
@@ -33,6 +34,13 @@
     padding-left 10px
     border 1px solid rgba(0,0,0,.4);
     border-radius 3px
+  .picker-box
+    position fixed
+    width 100%
+    left 0
+    bottom 0
+    background #ffffff
+    z-index 99
 </style>
 
 <script>
