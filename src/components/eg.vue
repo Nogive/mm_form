@@ -76,7 +76,6 @@ const userSchema={
   }
 };
 const objectSchema={
-  id:1,
   type: "object",
   properties:{
     name: {
@@ -143,6 +142,7 @@ const formSchema={
       type: 'string',
       ui: {
         label:'Input 姓名',
+        readonly:true,
         placeholder:'请输入姓名',
         widget: 'mm-input',
         widgetConfig:{
@@ -261,8 +261,9 @@ const formSchema={
             remoteUrl: "http://rap2api.taobao.org/app/mock/105585/options",//远程请求的地址
             paramName: "keyword",//过滤参数 key
             resField: "options",//返回的数据里的字段
-            otherParams:{a:2},
-            selectFirstitem: false//是否选中第一项
+            otherParams:{a:2,b:3},
+            selectFirstitem: false,//是否选中第一项
+            withAuthoration:true,
           }
         }
       }
