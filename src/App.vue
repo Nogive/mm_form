@@ -3,8 +3,8 @@
     <div class="outer">
       <div class="link">
         <router-link to="/">all</router-link> |
-        <router-link to="/sample">Try</router-link> |
-        <router-link to="/ncArray">array&object </router-link> 
+        <router-link to="/ncArray">array&object </router-link> |
+        <router-link to="/sample">try</router-link> 
       </div>
     </div>
     <router-view></router-view>

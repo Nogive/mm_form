@@ -320,35 +320,6 @@ const formSchema={
     }
   }
 };
-const schema={
-  type: 'object',
-  properties: {
-    area: {
-      type: 'string',
-      value:'120000',
-      ui: {
-        label:'area 选择省市区',
-        readonly:false,
-        widget: 'mm-area',
-        widgetConfig:{
-          columns:2,
-          clearable:true
-        }
-      },
-      rules:{
-        required:{
-          value:true,
-          errMsg:'必填'
-        }
-      }
-    },
-  },
-  globalConfig:{
-    constants:{
-      countLimit:0
-    }
-  }
-}
 
 var data={
   name:'cd',
