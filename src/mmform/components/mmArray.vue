@@ -1,7 +1,6 @@
 <template>
 
   <div class="__array-form-item space">
-    <div>
 
     <legend v-if="schema.ui.legend && schema.ui.showLegend" @click="collapse()">
       {{schema.ui.legend}}
@@ -40,7 +39,6 @@
         <van-icon name=delete></van-icon>删除全部 
       </van-button>
     </div>
-   </div>
   </div>
 
 </template>
