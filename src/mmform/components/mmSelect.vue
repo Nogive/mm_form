@@ -1,6 +1,6 @@
 <template>
   <div class="select-wrapper space">
-    <div class="select-header" :class="{disabled:disabled}" @click="expandOptions">
+    <div class="select-header" :class="{disabled:disabled}" @click="expandOptions" v-show="!hidden">
       <div class="mul-body" v-if="mergeConfig.multiple && selectedOptions.length>0">
         <span class="selected-item" v-for="(item,index) in selectedOptions" :key="index">{{item.label}}
           <i class="clear" @click.stop="clearThisOption(item)"></i>

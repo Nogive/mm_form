@@ -1,10 +1,10 @@
 <template>
-  <div class="photo space">
+  <div class="photo space" v-show="!hidden">
     <van-row gutter="5">
       <van-col class="img-box" span="8" v-for="(item,index) in photoLists" :key="index">
         <img class="img" :src="item.src" alt="" @click="enlargePhoto(item,index)">
       </van-col>
-      <van-col class="img-box" span="8" v-show="!readonly&&photoLists.length<maxLen">
+      <van-col class="img-box" span="8" v-show="!readonly&&photoLists.length<mergeConfig.maxLen">
         <div class="photo-img">
           <img class="img" src="./imgs/photo.png" alt="" @click="takePhoto">
         </div>
@@ -14,7 +14,7 @@
       <van-swipe :initialSwipe="currentIndex" @change="onChange" id="photoHeight">
         <van-swipe-item v-for="(item,index) in photoLists" :key="index" :class="{'currentEl':index==currentIndex}">
           <img class="img" :src="item.src" alt="" @click="showBig=false">
-          <van-icon class="icon" name="delete" @click="onDetele(item,index)" />
+          <van-icon v-show="!readonly" class="icon" name="delete" @click.stop="onDetele(item,index)" />
         </van-swipe-item>
       </van-swipe>
     </van-popup>
@@ -26,11 +26,13 @@ export default {
   mixins: [ncformCommon.mixins.vue.controlMixin],
   data () {
     return {
-      maxLen:9,
       showBig:false,
       currentItem:{},
       currentIndex:0,
-      photoLists:[]
+      photoLists:[],
+      defaultConfig:{
+        maxLen:9,
+      }
     }
   },
   mounted(){

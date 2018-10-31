@@ -1,5 +1,5 @@
 <template>
-  <div class="space">
+  <div class="space" v-show="!hidden">
     <!-- <label>{{mergeConfig.msg}}</label> -->
     <van-cell-group>
       <van-field 

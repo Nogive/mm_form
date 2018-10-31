@@ -1,6 +1,6 @@
 <template>
   <div class="area">
-    <div class="input-wrapper" @click="openArea">
+    <div class="input-wrapper" @click="openArea"  v-show="!hidden">
       <input 
         v-model="inputText" 
         type="text" 

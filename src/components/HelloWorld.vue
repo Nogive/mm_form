@@ -14,21 +14,27 @@ const formSchema={
   properties: {
     photo:{
       type:'array',
-      value:[
-        {
-          src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
-        },
-        {
-          src:'https://avatars3.githubusercontent.com/u/24405319?s=40&v=4'
-        },
-        {
-          src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
-        }
-      ],
+      // value:[
+      //   {
+      //     src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
+      //   },
+      //   {
+      //     src:'https://avatars3.githubusercontent.com/u/24405319?s=40&v=4'
+      //   },
+      //   {
+      //     src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
+      //   }
+      // ],
       ui:{
         label:'photo 拍照',
         readonly:false,
         widget:'mm-photo',
+      },
+      rules:{
+        required:{
+          value:true,
+          errMsg:'必填'
+        }
       }
     },
     location:{
@@ -36,7 +42,16 @@ const formSchema={
       ui:{
         label:'定位',
         readonly:false,
-        widget:'mm-location'
+        widget:'mm-location',
+        widgetConfig:{
+          drag:true
+        }
+      },
+      rules:{
+        required:{
+          value:true,
+          errMsg:'必填'
+        }
       }
     }
   }

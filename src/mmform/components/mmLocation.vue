@@ -1,6 +1,6 @@
 <template>
   <div class="location">
-    <van-cell-group>
+    <van-cell-group v-show="!hidden">
       <van-field 
         v-model="address" 
         placeholder="点击右侧定位图标进行定位" 
@@ -17,14 +17,14 @@
       <div class="addr-text">
         <van-row gutter=5>
           <van-col :span="21" class="search-box">
-            <input class="text" type="text" v-model="address" id="address" :readonly="!drag">
+            <input class="text" type="text" v-model="address" id="address" :readonly="!mergeConfig.drag">
             <ul class="tip" v-show="startSearch">
               <li class="tip-item" v-for="(item,index) in tipRes" :key="index" @click.stop.prevent="selectRes(item)">{{item.name}}</li>
             </ul>
           </van-col>
           <van-col :span="3">
             <div class="icon-btns">
-              <van-icon v-if="drag" class="icon" name="search" @click="onSearch"></van-icon>
+              <van-icon v-if="mergeConfig.drag" class="icon" name="search" @click="onSearch"></van-icon>
               <van-icon v-else class="icon" name="location" @click="onLocation"></van-icon>
             </div>
           </van-col>
@@ -33,7 +33,7 @@
       <div class="map-content">
         <div class="drag-map">
           <div id="mapContainer" class="mapmap"></div>
-          <van-icon v-if="drag" name="location" class="location-btn" @click.stop="onLocation"></van-icon>
+          <van-icon v-if="mergeConfig.drag" name="location" class="location-btn" @click.stop="onLocation"></van-icon>
         </div>
       </div>
     </van-popup>
@@ -50,11 +50,13 @@ export default {
     let _this=this;
     return {
       showMap:false,
-      drag:true,
       startSearch:false,
       address:'',
       center:[],
-      tipRes:[]
+      tipRes:[],
+      defaultConfig:{
+        drag:false,
+      }
     }
   },
   mounted(){
@@ -64,7 +66,14 @@ export default {
   },
   watch:{
     center(){
-      this.modelVal=this.center;
+      if(this.center){
+        console.log(this.center);
+        this.modelVal={
+          lng:this.center[0],
+          lat:this.center[1],
+          address:this.address
+        };
+      }
     }
   },
   computed:{
@@ -85,7 +94,7 @@ export default {
       map = new AMap.Map('mapContainer', {
         center: this.center,
         zoom: 15,
-        dragEnable:this.drag
+        dragEnable:this.mergeConfig.drag?this.mergeConfig.drag:this.defaultConfig.drag
       });
       //定位插件
       AMap.plugin('AMap.Geolocation', function() {
@@ -106,7 +115,7 @@ export default {
           _this.address=result.formattedAddress;
           _this.center=[result.position.lng,result.position.lat];
         }else{
-          Toast('定位失败，请稍后再试~')
+          _this.$toast('定位失败，请稍后再试~')
         }
       });
     },
@@ -129,7 +138,7 @@ export default {
     },
     showMapContent(){
       if(!this.readonly){
-        if(this.address!=""){
+        if(this.address&&this.address!=""){
           this.showMap=true;
           this.$nextTick(()=>{
             this._initMap();
