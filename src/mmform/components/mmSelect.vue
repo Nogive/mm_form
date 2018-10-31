@@ -158,6 +158,7 @@ export default {
         clearable:true,
         itemValueField: "value",
         itemLabelField: "label",
+        withAuthorization:false
       }
     }
   },
@@ -250,7 +251,7 @@ export default {
         params: JSON.parse(JSON.stringify(this.mergeConfig.enumSourceRemote.otherParams)) 
       };
       //设置请求头
-      if(this.mergeConfig.enumSourceRemote.withAuthoration){
+      if(this.mergeConfig.enumSourceRemote.withAuthorization){
         options.headers={
           'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('token')),
         }
