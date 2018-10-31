@@ -156,6 +156,8 @@ export default {
         filterable:false,
         filterLocal:true,
         clearable:true,
+        itemValueField: "value",
+        itemLabelField: "label",
       }
     }
   },
@@ -259,11 +261,13 @@ export default {
     },
     setResource(remote){//解析远程数据
       let res=[];
+      let labelField=this.mergeConfig.itemLabelField?this.mergeConfig.itemLabelField:this.defaultConfig.itemLabelField;
+      let valueField=this.mergeConfig.itemValueField?this.mergeConfig.itemValueField:this.defaultConfig.itemValueField;
       if(remote&&remote.length>0){
         remote.forEach(e=>{
           res.push({
-            label:e[this.mergeConfig.itemLabelField],
-            value:e[this.mergeConfig.itemValueField]
+            label:e[labelField],
+            value:e[valueField]
           })
         })
       }

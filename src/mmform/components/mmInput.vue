@@ -5,7 +5,8 @@
       <van-field 
         :disabled="disabled"
         :readonly="readonly"
-        :placeholder="placeholder"
+        :placeholder="placeholder||defaultConfig.placeholder"
+        :left-icon="leftIcon"
         :type="mergeConfig.type"
         v-show="!hidden"
         v-model="modelVal"
@@ -30,11 +31,20 @@ export default {
   data () {
     return {
       defaultConfig: { 
-        type: 'text'
-      }
+        type: 'text',
+        placeholder:'请输入内容'
+      },
     }
   },
-
+  computed:{
+    leftIcon:function(){
+      let res="";
+      if(this.mergeConfig.type&&this.mergeConfig.type=="tel"){
+        res="phone";
+      }
+      return res;
+    }
+  },
   methods: {
     // you can handle the modelVal before $emit it (before this.$emit('input'))
     _processModelVal (modelVal) {

@@ -8,7 +8,6 @@
 </template>
 <script>
 import "@/mmform/index";
-import areaList from "./data/area"
 const userSchema={
   type: "array",
   items: {
@@ -66,7 +65,6 @@ const userSchema={
     }
   },
   ui: {
-    showLegend:true,
     label:'array 子表',
     legend:'SKU配置表',
     widget: 'mm-array',
@@ -126,8 +124,6 @@ const objectSchema={
     }
   },
   ui: {
-    showLegend:true,
-    label:'object 对象',
     legend:'这是object 标题',
     widget: 'mm-object',
     widgetConfig: {
@@ -165,12 +161,18 @@ const formSchema={
           min:0
         }
       },
-      rules:{
+      rules: {
         required:true,
-        minimum:{
-          value:1,
-          errMsg:'值必须大于0'
-        },
+        customRule: [
+          {
+            script: "dx: {{$root.count}} != 0",
+            errMsg: "必填"
+          },
+          {
+            script: "dx: {{$root.count}} < 3",
+            errMsg: "值不能超过3"
+          }
+        ]
       }
     },
     note:{
@@ -203,6 +205,12 @@ const formSchema={
       },
       rules:{
         required:true,
+        customRule: [
+          {
+            script: "dx: {{$root.ok}}",
+            errMsg: "必填"
+          }
+        ]
       }
     },
     date:{
@@ -276,16 +284,71 @@ const formSchema={
         readonly:false,
         widget: 'mm-area',
         widgetConfig:{
-          areaList:areaList,
           columns:2,
           clearable:true
         }
       }
     },
     array:userSchema,
-    object:objectSchema
+    object:objectSchema,
+    photo:{
+      type:'object',
+      value:[
+        {
+          src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
+        },
+        {
+          src:'https://avatars3.githubusercontent.com/u/24405319?s=40&v=4'
+        },
+        {
+          src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
+        }
+      ],
+      ui:{
+        label:'photo 拍照',
+        readonly:false,
+        widget:'mm-photo',
+      }
+    },
+    location:{
+      type:'Object',
+      ui:{
+        label:'定位',
+        readonly:false,
+        widget:'mm-location'
+      }
+    }
   }
 };
+const schema={
+  type: 'object',
+  properties: {
+    area: {
+      type: 'string',
+      value:'120000',
+      ui: {
+        label:'area 选择省市区',
+        readonly:false,
+        widget: 'mm-area',
+        widgetConfig:{
+          columns:2,
+          clearable:true
+        }
+      },
+      rules:{
+        required:{
+          value:true,
+          errMsg:'必填'
+        }
+      }
+    },
+  },
+  globalConfig:{
+    constants:{
+      countLimit:0
+    }
+  }
+}
 
 var data={
   name:'cd',
@@ -314,13 +377,15 @@ export default {
   data () {
     return {
       isSchemaChanging:false,
-      formSchema: formSchema
+      formSchema: schema
     }
   },
   methods: {
     submit () {
       this.$ncformValidate('formSchema').then(data => {
         if (data.result) {
+          console.log(this.$data.formSchema.value);
+          /*
           let params={
             systemSchemaId:1,
             systemSchemaVersion:1,
@@ -328,6 +393,7 @@ export default {
             formData:this.$data.formSchema.value
           };
           console.log(params)
+          */
         }
       })
     },

@@ -12,7 +12,7 @@
     <div class="area-wrapper" v-show="areaOn">
       <van-area 
         v-model="endVal" 
-        :area-list="mergeConfig.areaList" 
+        :area-list="areaList" 
         :columns-num="mergeConfig.columns"
         ref="area"
         @confirm="confirmArea"
@@ -59,12 +59,14 @@
 <script>
 
 import ncformCommon from '@ncform/ncform-common'
+import areaList from "./data/area"
 
 export default {
   mixins: [ncformCommon.mixins.vue.controlMixin],
 
   data () {
     return {
+      areaList:areaList,
       endVal:'',//最终结果
       areaOn:false,
       inputText:'',//显示数据

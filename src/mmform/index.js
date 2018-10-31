@@ -14,20 +14,6 @@ import mmObject from "./components/mmObject";
 import mmArray from "./components/mmArray";
 import mmArea from "./components/mmArea";
 
-// 扩展的规则只需继续ValidationRule，实现validateLogic逻辑即可
-class MyCustomRule extends ncformCommon.ValidationRule {
-  constructor(props) {
-    console.log(props);
-    super(props);
-    this.name = "myCustom";
-    this.defaultErrMsg = "yeah, show my custom rule message";
-  }
-  validateLogic(val, ruleVal) {
-    this.errMsg = "dynamic error";
-    return val === "daniel";
-  }
-}
-
 Vue.use(vueNcform, {
   extComponents: {
     mmInput,
@@ -41,8 +27,7 @@ Vue.use(vueNcform, {
     mmObject,
     mmArray,
     mmArea
-  },
-  extRules: [{ myCustom: MyCustomRule }]
+  }
 });
 
 //set readonly
