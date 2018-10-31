@@ -249,6 +249,12 @@ export default {
         url: this.mergeConfig.enumSourceRemote.remoteUrl,
         params: JSON.parse(JSON.stringify(this.mergeConfig.enumSourceRemote.otherParams)) 
       };
+      //设置请求头
+      if(this.mergeConfig.enumSourceRemote.withAuthoration){
+        options.headers={
+          'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('token')),
+        }
+      }
       options.params[
         this.mergeConfig.enumSourceRemote.paramName
       ] = query;
