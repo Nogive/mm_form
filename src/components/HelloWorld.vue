@@ -13,7 +13,7 @@ const formSchema={
   type: 'object',
   properties: {
     photo:{
-      type:'object',
+      type:'array',
       value:[
         {
           src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'

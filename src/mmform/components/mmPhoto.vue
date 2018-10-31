@@ -4,7 +4,7 @@
       <van-col class="img-box" span="8" v-for="(item,index) in photoLists" :key="index">
         <img class="img" :src="item.src" alt="" @click="enlargePhoto(item,index)">
       </van-col>
-      <van-col class="img-box" span="8" v-if="showTakePhoto">
+      <van-col class="img-box" span="8" v-show="!readonly&&photoLists.length<maxLen">
         <div class="photo-img">
           <img class="img" src="./imgs/photo.png" alt="" @click="takePhoto">
         </div>
@@ -21,35 +21,24 @@
   </div>
 </template>
 <script>
-const maxLen=9;
 import ncformCommon from '@ncform/ncform-common'
 export default {
   mixins: [ncformCommon.mixins.vue.controlMixin],
   data () {
     return {
+      maxLen:9,
       showBig:false,
       currentItem:{},
       currentIndex:0,
       photoLists:[]
     }
   },
-  created(){
-    this.photoLists=this.value;
+  mounted(){
+    this.photoLists=this.value||[];
   },
   watch:{
     photoLists(){
       this.modelVal=this.photoLists;
-    }
-  },
-  computed:{
-    showTakePhoto:function(){
-      if(this.readonly){
-        return false;
-      }else if(this.value.length<maxLen){
-        return true;
-      }else{
-        return false;
-      }
     }
   },
   methods: {
@@ -103,8 +92,9 @@ export default {
       })
     },
     takePhoto(){
-      this.mergeConfig.enumSource.push({
-        path:'@/assets/images/10.jpg'
+      this.photoLists.push({
+        uuid:'222',
+        src:'@/assets/images/10.jpg'
       });
     }
   }
