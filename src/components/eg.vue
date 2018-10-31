@@ -377,7 +377,7 @@ export default {
   data () {
     return {
       isSchemaChanging:false,
-      formSchema: schema
+      formSchema: formSchema
     }
   },
   methods: {

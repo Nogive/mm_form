@@ -3,9 +3,8 @@
     <div class="outer">
       <div class="link">
         <router-link to="/">all</router-link> |
-        <router-link to="/ncArray">ex_ncform </router-link> |
         <router-link to="/sample">Try</router-link> |
-        <router-link to="/eg">封装成mmform</router-link> 
+        <router-link to="/ncArray">array&object </router-link> 
       </div>
     </div>
     <router-view></router-view>
@@ -13,7 +12,6 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
 
 export default {
   name: 'App',
