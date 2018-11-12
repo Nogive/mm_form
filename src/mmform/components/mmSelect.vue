@@ -134,6 +134,7 @@
 <script>
 import axios from "axios";
 import _get from "lodash-es/get";
+import _cloneDeep from 'lodash-es/cloneDeep';
 import ncformCommon from '@ncform/ncform-common'
 
 export default {
@@ -152,12 +153,12 @@ export default {
       optionSource:[],//显示选项源
       
       defaultConfig: { //默认值
-        multiple:false,
-        filterable:false,
-        filterLocal:true,
-        clearable:true,
-        itemValueField: "value",
-        itemLabelField: "label",
+       multiple: false, // 是否多选
+        clearable: true, // 是否出现清空选项
+        filterable: false, // 是否可搜索，即可输入关键字
+        filterLocal: true, // 搜索本地的还是远程的数据，当为true时，就算配了enumSourceRemote，也只会从远程取一次数据
+        itemLabelField: 'label', // 项数据表示label的字段
+        itemValueField: 'value', // 项数据表示value的字段
         withAuthorization:false
       }
     }
@@ -192,6 +193,13 @@ export default {
         res=true;
       }
       return res;
+    },
+    otherParams() {
+      let otherParams = _cloneDeep(_get(this.mergeConfig, 'enumSourceRemote.otherParams'), {});
+      for (let key in otherParams) {
+        otherParams[key] = this._analyzeVal(otherParams[key]);
+      }
+      return otherParams;
     }
   },
   watch:{
@@ -216,6 +224,18 @@ export default {
         this.inputText="";
       }
       this.modelVal=this.endVal;
+    },
+    otherParams(newVal, oldVal) {
+      if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+        // if (oldVal !== undefined) { // 非第一次
+        //   if (Array.isArray(this.modelVal)) {
+        //     this.modelVal = [];
+        //   } else {
+        //     this.modelVal = null;
+        //   }
+        // }
+        this.remoteMethod();
+      }
     }
   },
   methods: {
@@ -248,12 +268,12 @@ export default {
       if(!_get(this.mergeConfig, 'enumSourceRemote.remoteUrl')){ return; };
       const options = {
         url: this.mergeConfig.enumSourceRemote.remoteUrl,
-        params: JSON.parse(JSON.stringify(this.mergeConfig.enumSourceRemote.otherParams)) 
+        params: JSON.parse(JSON.stringify(this.otherParams)) 
       };
       //设置请求头
-      if(this.mergeConfig.enumSourceRemote.withAuthorization){
+      if(this.mergeConfig.withAuthorization){
         options.headers={
-          'Authorization': JSON.parse(window.localStorage.getItem('token')),
+          'Authentication': JSON.parse(window.localStorage.getItem('token')),
         }
       }
       options.params[
