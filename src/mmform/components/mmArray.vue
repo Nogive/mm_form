@@ -10,7 +10,7 @@
     <div v-show="!mergeConfig.collapsed" v-for="(dataItem, idx) in schema.value" :key="dataItem.__dataSchema.__id" class="list-item">
       <div class="list-item-label">
         <label class="title">{{dataItem.__dataSchema.ui.label}} {{idx + 1}}</label>
-        <van-icon v-if="!schema.ui.readonly" name="delete" @click="delItem(idx)" class="icon"></van-icon> 
+        <van-icon v-if="!hiddenBtn" name="delete" @click="delItem(idx)" class="icon"></van-icon> 
       </div>
 
       <!-- array item 是 正常的 object 类型 -->
@@ -31,7 +31,7 @@
 
     </div>
 
-    <div v-show="!mergeConfig.collapsed" class="btn-group" v-if="!schema.ui.readonly">
+    <div v-show="!mergeConfig.collapsed" class="btn-group" v-if="!hiddenBtn">
       <van-button @click="addItem()" plain type="primary" class="btn">
         <van-icon name="add-o"></van-icon>增加
       </van-button>
@@ -106,6 +106,12 @@
     mixins: [layoutArrayMixin],
     data(){
       return {
+        
+      }
+    },
+    computed:{
+      hiddenBtn(){
+        return this._analyzeVal(this.schema.ui.readonly);//支持dx表达式
       }
     }
   }

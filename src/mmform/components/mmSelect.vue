@@ -253,7 +253,7 @@ export default {
       //设置请求头
       if(this.mergeConfig.enumSourceRemote.withAuthorization){
         options.headers={
-          'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('token')),
+          'Authorization': JSON.parse(window.localStorage.getItem('token')),
         }
       }
       options.params[

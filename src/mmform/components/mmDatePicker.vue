@@ -3,10 +3,9 @@
     <input 
       v-show="!hidden"
       v-model="inputVal" 
-      :disabled="readonly" 
       class="date-box" 
       type="text" 
-      readonly
+      :readonly="readonly"
       placeholder="点击选择日期" 
       @click="ToggleDatwPicker">
 

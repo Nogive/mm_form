@@ -1,7 +1,5 @@
 import Vue from "vue";
 import vueNcform from "@ncform/ncform";
-import ncformCommon from "@ncform/ncform-common";
-
 import mmInput from "./components/mmInput";
 import mmNumber from "./components/mmNumber";
 import mmTextarea from "./components/mmTextarea";
@@ -29,21 +27,3 @@ Vue.use(vueNcform, {
     mmArea
   }
 });
-
-//set readonly
-function recursiveReadOnly(schema, readonly) {
-  for (var o in schema) {
-    let childFiled = schema[o];
-    if (childFiled.ui.widget == "mm-array") {
-      childFiled.ui.readonly = readonly;
-      let arraySchema = childFiled.items.properties;
-      recursiveReadOnly(arraySchema, readonly);
-    } else if (childFiled.ui.widget == "mm-object") {
-      let objectSchema = childFiled.properties;
-      recursiveReadOnly(objectSchema, readonly);
-    } else {
-      childFiled.ui.readonly = readonly;
-    }
-  }
-}
-Vue.prototype.recursiveReadOnly = recursiveReadOnly;
