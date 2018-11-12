@@ -109,6 +109,9 @@ export default {
       });
     },
     onLocation(){
+     this.onLocationByGaode();
+    },
+    onLocationByGaode(){
       var _this=this;
       this.geolocation.getCurrentPosition(function(status,result){
         if(status=='complete'){
@@ -118,6 +121,9 @@ export default {
           _this.$toast('定位失败，请稍后再试~')
         }
       });
+    },
+    onLocationByDing(){
+      
     },
     onDrag(){
       let _this=this;
@@ -181,6 +187,7 @@ export default {
   padding 10px 0
   .addr-box
     width 100%
+    padding 10px 0
     .addr-text
       padding-left 8px
       .search-box
