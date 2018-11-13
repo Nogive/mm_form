@@ -3,7 +3,6 @@
     <ncform v-if="!isSchemaChanging" :form-schema="formSchema" form-name="mm-form" v-model="formSchema.value"></ncform>
     <van-button size="small" @click="submit()">Submit</van-button>
     <van-button size="small" @click="setValue()">set value to schema</van-button>
-    <van-button size="small" @click="setReadonly">set readonly</van-button>
   </div>
 </template>
 <script>
@@ -186,32 +185,10 @@ export default {
     },
     setValue(){//设置值
       this.formSchema.value=data;
-    },
-    setReadonly(){//设置readonly
-      this.isSchemaChanging=true;
-      let schema=this.formSchema.properties;
-      this.$nextTick(() => {
-        recursiveReadOnly(schema,true);
-        this.isSchemaChanging=false;
-      });
     }
   }
 }
-function recursiveReadOnly(schema,readonly){
-  for(var o in schema){
-    let childFiled=schema[o];
-    if(childFiled.layoutType=="array"){
-      childFiled.ui.readonly=readonly;
-      let arraySchema=childFiled.items.properties;
-      recursiveReadOnly(arraySchema,readonly);
-    }else if(childFiled.layoutType=="object"){
-      let objectSchema=childFiled.properties;
-      recursiveReadOnly(objectSchema,readonly);
-    }else{
-      childFiled.ui.readonly=readonly;
-    }
-  }
-}
+
 </script>
 <style scoped lang="stylus">
 .input-box

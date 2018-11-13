@@ -17,14 +17,14 @@
       <div class="addr-text">
         <van-row gutter=5>
           <van-col :span="21" class="search-box">
-            <input class="text" type="text" v-model="address" id="address" :readonly="!mergeConfig.drag">
+            <input class="text" type="text" v-model="address" id="address" :readonly="!drag">
             <ul class="tip" v-show="startSearch">
               <li class="tip-item" v-for="(item,index) in tipRes" :key="index" @click.stop.prevent="selectRes(item)">{{item.name}}</li>
             </ul>
           </van-col>
           <van-col :span="3">
             <div class="icon-btns">
-              <van-icon v-if="mergeConfig.drag" class="icon" name="search" @click="onSearch"></van-icon>
+              <van-icon v-if="drag" class="icon" name="search" @click="onSearch"></van-icon>
               <van-icon v-else class="icon" name="location" @click="onLocation"></van-icon>
             </div>
           </van-col>
@@ -33,7 +33,7 @@
       <div class="map-content">
         <div class="drag-map">
           <div id="mapContainer" class="mapmap"></div>
-          <van-icon v-if="mergeConfig.drag" name="location" class="location-btn" @click.stop="onLocation"></van-icon>
+          <van-icon v-if="drag" name="location" class="location-btn" @click.stop="onLocation"></van-icon>
         </div>
       </div>
     </van-popup>
@@ -62,13 +62,12 @@ export default {
   },
   mounted(){
     this.address=this.value.address;
-    this.center=this.value.center;
+    this.center=[this.value.lng,this.value.lat];
     this._initMap();
   },
   watch:{
     center(){
       if(this.center){
-        console.log(this.center);
         this.modelVal={
           lng:this.center[0],
           lat:this.center[1],
@@ -84,6 +83,9 @@ export default {
       }else{
         return "location"
       }
+    },
+    drag(){
+      return this._analyzeVal(this.config.drag);
     }
   },
   methods: {
@@ -95,7 +97,7 @@ export default {
       map = new AMap.Map('mapContainer', {
         center: this.center,
         zoom: 15,
-        dragEnable:this.mergeConfig.drag?this.mergeConfig.drag:this.defaultConfig.drag
+        dragEnable:this.drag
       });
       //定位插件
       AMap.plugin('AMap.Geolocation', function() {
@@ -111,15 +113,8 @@ export default {
     },
     onLocation(){
       let _this=this;
-      if(dd){
+      if(dd.android||dd.ios){
         onLocationByDing().then(res=>{
-          _this.address=res.address;
-          _this.center=[res.longitude,res.latitude];
-        },err=>{
-          console.log(err);
-        })
-      }else if(navigator){
-        onLocationByCordova().then(res=>{
           _this.address=res.address;
           _this.center=[res.longitude,res.latitude];
         },err=>{
@@ -140,9 +135,6 @@ export default {
         }
       });
     },
-    onLocationByDing(){
-      
-    },
     onDrag(){
       let _this=this;
       AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
@@ -155,20 +147,18 @@ export default {
           _this.center=[positionResult.position.lng,positionResult.position.lat];
         });
         positionPicker.on('fail', function(positionResult) {
-          Toast('拖拽出现问题，请保证网络环境，稍后重试~');
+          console.log('拖拽出现问题，请保证网络环境，稍后重试~');
         });
         positionPicker.start();
       });
     },
     showMapContent(){
-      if(!this.readonly){
-        if(this.address&&this.address!=""){
-          this.showMap=true;
-          this.$nextTick(()=>{
-            this._initMap();
-            this.onDrag();
-          })
-        }
+      if(this.address&&this.address!=""){
+        this.showMap=true;
+        this.$nextTick(()=>{
+          this._initMap();
+          this.onDrag();
+        })
       }
     },
     onSearch(){

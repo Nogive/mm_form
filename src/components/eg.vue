@@ -3,7 +3,6 @@
     <ncform v-if="!isSchemaChanging" :form-schema="formSchema" form-name="formSchema" v-model="formSchema.value"></ncform>
     <van-button size="small" @click="submit()">Submit</van-button>
     <van-button size="small" @click="setValue()">setValue</van-button>
-    <van-button size="small" @click="setReadonly()">setReadonly</van-button>
   </div>
 </template>
 <script>
@@ -17,6 +16,7 @@ const userSchema={
         type: 'string',
         ui: {
           label:'Input 输入框',
+          readonly:'dx:{{$const.mode}}=="view"',
           widget: 'mm-input',
           placeholder:'请输入姓名'
         }
@@ -25,6 +25,7 @@ const userSchema={
         type:'number',
         ui:{
           label:'input-number 计数',
+          readonly:'dx:{{$const.mode}}=="view"',
           widget:'mm-number'
         }
       },
@@ -32,6 +33,7 @@ const userSchema={
         type:'boolean',
         ui:{
           label:'radio 是否',
+          readonly:'dx:{{$const.mode}}=="view"',
           widget:'mm-radio'
         }
       },
@@ -40,6 +42,7 @@ const userSchema={
         value:'2',
         ui:{
           label:'select 下拉框选择器',
+          readonly:'dx:{{$const.mode}}=="view"',
           widget:'mm-select',
           widgetConfig:{
             enumSource:[
@@ -67,6 +70,7 @@ const userSchema={
   ui: {
     label:'array 子表',
     legend:'SKU配置表',
+    readonly:'dx:{{$const.mode}}=="view"',
     widget: 'mm-array',
     widgetConfig: {
       collapsed: false
@@ -80,6 +84,7 @@ const objectSchema={
       type: 'string',
       ui: {
         label:'Input 输入框',
+        readonly:'dx:{{$const.mode}}=="view"',
         widget: 'mm-input',
         placeholder:'请输入姓名'
       },
@@ -88,6 +93,7 @@ const objectSchema={
       type:'number',
       ui:{
         label:'input-number 计数',
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-number'
       }
     },
@@ -95,6 +101,7 @@ const objectSchema={
       type:'boolean',
       ui:{
         label:'radio 是否',
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-radio'
       }
     },
@@ -103,6 +110,7 @@ const objectSchema={
       value:'2',
       ui:{
         label:'select 下拉框选择器',
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-select',
         widgetConfig:{
           enumSource:[
@@ -138,7 +146,7 @@ const formSchema={
       type: 'string',
       ui: {
         label:'Input 姓名',
-        readonly:true,
+        readonly:'dx:{{$const.mode}}=="view"',
         placeholder:'请输入姓名',
         widget: 'mm-input',
         widgetConfig:{
@@ -155,6 +163,7 @@ const formSchema={
       type:'number',
       ui:{
         label:'input-number 计数',
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-number',
         widgetConfig:{
           step:0.2,
@@ -179,6 +188,7 @@ const formSchema={
       type:'string',
       ui:{
         label:'textarea 多行文本',
+        readonly:'dx:{{$const.mode}}=="view"',
         placeholder:'在这里输入备注或留言',
         widget:'mm-textarea',
         widgetConfig:{
@@ -197,7 +207,7 @@ const formSchema={
       type:'boolean',
       ui:{
         label:'radio 是否',
-        readonly:false,
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-radio',
         widgetConfig:{
           size:'30px'
@@ -217,7 +227,7 @@ const formSchema={
       type:'number',
       ui:{
         label:'dataPicker 日期选择器',
-        readonly:false,
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-date-picker',
         widgetConfig:{
           type:'date',
@@ -235,7 +245,7 @@ const formSchema={
       value:3,
       ui:{
         label:'select 单选 多选下拉框选择器',
-        readonly:false,
+        readonly:'dx:{{$const.mode}}=="view"',
         widget:'mm-select',
         widgetConfig:{
           multiple:true,
@@ -281,7 +291,7 @@ const formSchema={
       value:'120000',
       ui: {
         label:'area 选择省市区',
-        readonly:false,
+        readonly:'dx:{{$const.mode}}=="view"',
         widget: 'mm-area',
         widgetConfig:{
           columns:2,
@@ -314,9 +324,17 @@ const formSchema={
       type:'Object',
       ui:{
         label:'定位',
-        readonly:false,
-        widget:'mm-location'
+        readonly:'dx:{{$const.mode}}=="view"',
+        widget:'mm-location',
+        widgetConfig:{
+          drag:'dx:{{$const.mode}}=="edit"',
+        }
       }
+    }
+  },
+  globalConfig:{
+    constants:{
+      mode:'view'
     }
   }
 };
@@ -367,14 +385,6 @@ export default {
           */
         }
       })
-    },
-    setReadonly(){
-      this.isSchemaChanging=true;
-      let schema=this.formSchema.properties;
-      this.$nextTick(() => {
-        this.recursiveReadOnly(schema,true);
-        this.isSchemaChanging=false;
-      });
     },
     setValue(){
       this.formSchema.value=data;
