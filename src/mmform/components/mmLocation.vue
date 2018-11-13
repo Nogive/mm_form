@@ -41,6 +41,7 @@
 </template>
 <script>
 import ncformCommon from '@ncform/ncform-common'
+import {onLocationByDing,onLocationByCordova} from "./utils"
 import AMap from 'AMap'
 import AMapUI from 'AMapUI'
 var map;
@@ -109,7 +110,24 @@ export default {
       });
     },
     onLocation(){
-     this.onLocationByGaode();
+      let _this=this;
+      if(dd){
+        onLocationByDing().then(res=>{
+          _this.address=res.address;
+          _this.center=[res.longitude,res.latitude];
+        },err=>{
+          console.log(err);
+        })
+      }else if(navigator){
+        onLocationByCordova().then(res=>{
+          _this.address=res.address;
+          _this.center=[res.longitude,res.latitude];
+        },err=>{
+          console.log(err);
+        })
+      }else{
+        this.onLocationByGaode();
+      }
     },
     onLocationByGaode(){
       var _this=this;
