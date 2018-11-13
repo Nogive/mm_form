@@ -22,6 +22,7 @@
 </template>
 <script>
 import ncformCommon from '@ncform/ncform-common'
+import {takePhotoByDing,takePhotoByCordova,generateUuid} from "./utils"
 export default {
   mixins: [ncformCommon.mixins.vue.controlMixin],
   data () {
@@ -94,10 +95,29 @@ export default {
       })
     },
     takePhoto(){
-      this.photoLists.push({
-        uuid:'222',
-        src:'@/assets/images/10.jpg'
-      });
+      let uuId=generateUuid();
+      let _this=this;
+      if(window.dd&&(window.dd.android||window.dd.ios)){
+        takePhotoByDing().then(res=>{
+          _this.photoLists.push({
+            uuid:uuId,
+            url:res
+          })
+        })
+      }else if(window.device){
+        takePhotoByCordova().then(res=>{
+          _this.photoLists.push({
+            uuid:uuId,
+            url:res
+          })
+        })
+      }else{
+        console.log(uuId);
+        _this.photoLists.push({
+          uuid:uuId,
+          src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
+        })
+      }
     }
   }
 }

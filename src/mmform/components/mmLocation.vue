@@ -113,8 +113,15 @@ export default {
     },
     onLocation(){
       let _this=this;
-      if(dd.android||dd.ios){
+      if(window.dd &&(window.dd.android||window.dd.ios)){
         onLocationByDing().then(res=>{
+          _this.address=res.address;
+          _this.center=[res.longitude,res.latitude];
+        },err=>{
+          console.log(err);
+        })
+      } else if(window.device){
+        onLocationByCordova().then(res=>{
           _this.address=res.address;
           _this.center=[res.longitude,res.latitude];
         },err=>{
