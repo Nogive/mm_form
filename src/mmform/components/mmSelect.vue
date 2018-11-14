@@ -271,9 +271,9 @@ export default {
         params: JSON.parse(JSON.stringify(this.otherParams)) 
       };
       //设置请求头
-      if(this.mergeConfig.withAuthorization){
+      if(this.mergeConfig.enumSourceRemote&&this.mergeConfig.enumSourceRemote.withAuthorization){
         options.headers={
-          'Authentication': JSON.parse(window.localStorage.getItem('token')),
+          'Authorization': JSON.parse(window.localStorage.getItem('token')),
         }
       }
       options.params[
