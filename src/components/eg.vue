@@ -78,7 +78,7 @@ const userSchema={
   }
 };
 const objectSchema={
-  type: "object",
+  type: 'object',
   properties:{
     name: {
       type: 'string',
@@ -114,12 +114,12 @@ const objectSchema={
         widgetConfig:{
           filterable:true,
           filterLocal:true,
-          itemValueField: "key",
-          itemLabelField: "value",
+          itemValueField: 'key',
+          itemLabelField: 'value',
           enumSourceRemote: {
-            remoteUrl: "http://rap2api.taobao.org/app/mock/105585/options",//远程请求的地址
-            paramName: "keyword",
-            resField: "options",
+            remoteUrl: 'http://rap2api.taobao.org/app/mock/105585/options',//远程请求的地址
+            paramName: 'keyword',
+            resField: 'options',
             otherParams:{},
             selectFirstitem: true,//是否选中第一项
             withAuthorization:true,
@@ -177,12 +177,12 @@ const formSchema={
         required:true,
         customRule: [
           {
-            script: "dx: {{$root.count}} != 0",
-            errMsg: "必填"
+            script: 'dx: {{$root.count}} != 0',
+            errMsg: '必填'
           },
           {
-            script: "dx: {{$root.count}} < 3",
-            errMsg: "值不能超过3"
+            script: 'dx: {{$root.count}} < 3',
+            errMsg: '值不能超过3'
           }
         ]
       }
@@ -220,8 +220,8 @@ const formSchema={
         required:true,
         customRule: [
           {
-            script: "dx: {{$root.ok}}",
-            errMsg: "必填"
+            script: 'dx: {{$root.ok}}',
+            errMsg: '必填'
           }
         ]
       }
@@ -276,12 +276,12 @@ const formSchema={
               label:'项目5'
             }
           ],
-          itemValueField: "key",//返回数据里的 value的值对应本地的value
-          itemLabelField: "value",////返回数据里的 key的值对应本地的label
+          itemValueField: 'key',//返回数据里的 value的值对应本地的value
+          itemLabelField: 'key',////返回数据里的 key的值对应本地的label
           enumSourceRemote: {
-            remoteUrl: "http://rap2api.taobao.org/app/mock/105585/options",//远程请求的地址
-            paramName: "keyword",//过滤参数 key
-            resField: "options",//返回的数据里的字段
+            remoteUrl: 'http://rap2api.taobao.org/app/mock/105585/options',//远程请求的地址
+            paramName: 'keyword',//过滤参数 key
+            resField: 'options',//返回的数据里的字段
             otherParams:{a:2,b:3},
             selectFirstitem: false,//是否选中第一项
             withAuthoration:true,
