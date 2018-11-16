@@ -105,28 +105,31 @@ const objectSchema={
         widget:'mm-radio'
       }
     },
-    pullselect:{
+    pingxiang:{
       type:'string',
-      value:'2',
       ui:{
-        label:'select 下拉框选择器',
-        readonly:'dx:{{$const.mode}}=="view"',
+        label:'品项选择',
+        readonly:'dx: {{$const.mode}}=="view"',
         widget:'mm-select',
         widgetConfig:{
-          enumSource:[
-            {
-              value:1,
-              label:'选项1'
-            },
-            {
-              value:2,
-              label:'选项2'
-            },
-            {
-              value:3,
-              label:'选项3'
-            },
-          ]
+          filterable:true,
+          filterLocal:true,
+          itemValueField: "key",
+          itemLabelField: "value",
+          enumSourceRemote: {
+            remoteUrl: "http://rap2api.taobao.org/app/mock/105585/options",//远程请求的地址
+            paramName: "keyword",
+            resField: "options",
+            otherParams:{},
+            selectFirstitem: true,//是否选中第一项
+            withAuthorization:true,
+          }
+        }
+      },
+      rules:{
+        required:{
+          value:true,
+          errMsg:'必填'
         }
       }
     }
