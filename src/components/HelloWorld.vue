@@ -14,17 +14,6 @@ const formSchema={
   properties: {
     photo:{
       type:'array',
-      // value:[
-      //   {
-      //     src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
-      //   },
-      //   {
-      //     src:'https://avatars3.githubusercontent.com/u/24405319?s=40&v=4'
-      //   },
-      //   {
-      //     src:'http://xfield.oss-cn-hangzhou.aliyuncs.com/100001@1533283255000@E26CA3E0-F4F5-42DE-9E6C-9F4D564E0D65.jpg'
-      //   }
-      // ],
       ui:{
         label:'photo 拍照',
         readonly:false,
@@ -53,12 +42,31 @@ const formSchema={
           errMsg:'必填'
         }
       }
+    },
+    name:{
+      type:'Object',
+      ui:{
+        label:'售点名称',
+        readonly:true,
+        widget:'mm-foreign-object',
+        widgetConfig:{
+          itemLabelField:'value',
+          remoteUrl: 'http://rap2api.taobao.org/app/mock/105585/options',//远程请求的地址
+          paramName: 'keyword',
+          resField: 'options',
+          otherParams:{id:'dx:{{$root.name.id}}'},
+          withAuthorization:true,
+        }
+      }
     }
   }
 };
 
 var data={
-  
+  name:{
+    id:2,
+    name:'ceshi2'
+  }
 };
 export default {
   data () {
