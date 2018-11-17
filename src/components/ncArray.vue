@@ -33,10 +33,10 @@ var data={
 }
 
 const userSchema={
-  type: "array",
+  type: 'array',
   layoutType:'array',
   items: {
-    type: "object",
+    type: 'object',
     properties:{
       name: {
         type: 'string',
@@ -100,7 +100,7 @@ const userSchema={
   }
 };
 const objectSchema={
-  type: "object",
+  type: 'object',
   layoutType:'object',
   properties:{
     name: {
