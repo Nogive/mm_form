@@ -43,8 +43,12 @@ const formSchema={
         }
       }
     },
-    name:{
+    name:{ 
       type:'Object',
+      value:{
+        id:1,
+        name:'ceshi'
+      },
       ui:{
         label:'售点名称',
         readonly:true,

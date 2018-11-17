@@ -68,10 +68,14 @@ export default {
         let tempArr = this.mergeConfig.resField ? _get(res.data, this.mergeConfig.resField) : res.data;
         console.log('data:',tempArr);
         let temp=tempArr[0];
-        _this.tempVal={
-            id:_this.value.id,
-            name:temp[_this.mergeConfig.itemLabelField]
-        };
+        _this.name=temp[_this.mergeConfig.itemLabelField];
+        if(_this.value){
+            _this.tempVal.id=_this.value.id;
+        }
+        // _this.tempVal={
+        //     id:_this.value?_this.value.id:'',
+        //     name:temp[_this.mergeConfig.itemLabelField]
+        // };
       },err=>{
           console.log('error:',err);
       });
