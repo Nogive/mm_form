@@ -6,7 +6,7 @@
         type="text" 
         class="title" 
         :placeholder="placeholder || '选择省市区'"
-        :readonly="readonly">
+        readonly>
       <i class="icon clear" v-show="inputText!=''&&mergeConfig.clearable&&!readonly" @click.stop="clearArea"></i>
     </div>
     <div class="area-wrapper" v-show="areaOn">

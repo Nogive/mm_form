@@ -153,7 +153,7 @@ export default {
       optionSource:[],//显示选项源
       
       defaultConfig: { //默认值
-       multiple: false, // 是否多选
+        multiple: false, // 是否多选
         clearable: true, // 是否出现清空选项
         filterable: false, // 是否可搜索，即可输入关键字
         filterLocal: true, // 搜索本地的还是远程的数据，当为true时，就算配了enumSourceRemote，也只会从远程取一次数据

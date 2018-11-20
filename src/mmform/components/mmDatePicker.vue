@@ -5,7 +5,7 @@
       v-model="inputVal" 
       class="date-box" 
       type="text" 
-      :readonly="readonly"
+      readonly
       placeholder="点击选择日期" 
       @click="ToggleDatePicker">
 

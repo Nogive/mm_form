@@ -38,7 +38,8 @@
   width 100%
   &.space
     padding 15px 0 10px
-  & > legend 
+  & > legend
+    width inherit 
     border-left: 6px solid #878D99
     padding: 6px
     background-color: #d8dce5
