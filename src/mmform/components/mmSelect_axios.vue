@@ -132,7 +132,7 @@
 </style>
 
 <script>
-var superagent = require('superagent');
+import axios from "axios";
 import _get from "lodash-es/get";
 import _cloneDeep from 'lodash-es/cloneDeep';
 import ncformCommon from '@ncform/ncform-common'
@@ -163,14 +163,14 @@ export default {
       }
     }
   },
-  mounted(){
+  created(){
     if(this.mergeConfig.enumSourceRemote){
       this.remoteMethod()
     }else{
       this.localSource=this.mergeConfig.enumSource;
       this.optionSource=this.mergeConfig.enumSource;
-      this._setModelVal();
     }
+    this._setModelVal();
   },
   computed:{
     showSearch:function(){//是否显示输入框
@@ -200,9 +200,6 @@ export default {
         otherParams[key] = this._analyzeVal(otherParams[key]);
       }
       return otherParams;
-    },
-    selectFirstitem(){
-      return this._analyzeVal(_get(this.mergeConfig, 'enumSourceRemote.selectFirstitem'));
     }
   },
   watch:{
@@ -231,7 +228,6 @@ export default {
     otherParams(newVal, oldVal) {
       if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         // if (oldVal !== undefined) { // 非第一次
-        //   console.log(Array.isArray(this.modelVal));
         //   if (Array.isArray(this.modelVal)) {
         //     this.modelVal = [];
         //   } else {
@@ -270,29 +266,25 @@ export default {
     },
     remoteMethod(query) {//远程请求选项
       if(!_get(this.mergeConfig, 'enumSourceRemote.remoteUrl')){ return; };
-      var agent=superagent.agent();
-      //设置请求头
-      if(this.mergeConfig.enumSourceRemote.withAuthorization){
-        agent.set('Authorization',JSON.parse(window.localStorage.getItem('token')))
-      }
       const options = {
         url: this.mergeConfig.enumSourceRemote.remoteUrl,
-        params: JSON.parse(JSON.stringify(this.otherParams))
+        params: JSON.parse(JSON.stringify(this.otherParams)) 
       };
+      //设置请求头
+      if(this.mergeConfig.enumSourceRemote&&this.mergeConfig.enumSourceRemote.withAuthorization){
+        options.headers={
+          'Authorization': JSON.parse(window.localStorage.getItem('token')),
+        }
+      }
       options.params[
         this.mergeConfig.enumSourceRemote.paramName
       ] = query;
-      agent.get(options.url)
-        .query(options.params)
-        .then(res=>{
-          let tempArr = this.mergeConfig.enumSourceRemote.resField ? _get(res.body, this.mergeConfig.enumSourceRemote.resField) : res.body;
-          this.localSource=this.setResource(tempArr);
-          this.optionSource=this.setResource(tempArr);
-          this.selectFirstOption();
-          this._setModelVal();
-        },err=>{
-          console.log(err.response);
-        })
+      axios(options).then(res => {
+        let tempArr = this.mergeConfig.enumSourceRemote.resField ? _get(res.data, this.mergeConfig.enumSourceRemote.resField) : res.data;
+        this.localSource=this.setResource(tempArr);
+        this.optionSource=this.setResource(tempArr);
+        this.selectFirstOption();
+      });
     },
     setResource(remote){//解析远程数据
       let res=[];
@@ -301,8 +293,8 @@ export default {
       if(remote&&remote.length>0){
         remote.forEach(e=>{
           res.push({
-            label:_get(e,labelField),
-            value:_get(e,valueField)
+            label:e[labelField],
+            value:e[valueField]
           })
         })
       }
@@ -310,7 +302,7 @@ export default {
     },
     selectFirstOption(){//选中第一项
       let isMul=this.mergeConfig.multiple?this.mergeConfig.multiple:this.defaultConfig.multiple;
-      if (this.selectFirstitem && this.optionSource.length > 0) {
+      if (this.mergeConfig.enumSourceRemote.selectFirstitem && this.optionSource.length > 0) {
         if(isMul){
           this.selectedOptions=[this.optionSource[0]];
         }else{

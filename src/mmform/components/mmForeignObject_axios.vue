@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-var superagent = require('superagent');
+import axios from "axios";
 import ncformCommon from '@ncform/ncform-common'
 import _get from "lodash-es/get";
 import _cloneDeep from 'lodash-es/cloneDeep';
@@ -48,27 +48,26 @@ export default {
     remoteMethod(query){
       let _this=this;
       if(!_get(this.mergeConfig, 'remoteUrl')){ return; };
-      var agent=superagent.agent();
-      //设置请求头
-      if(this.mergeConfig.withAuthorization){
-        agent.set('Authorization',JSON.parse(window.localStorage.getItem('token')))
-      }
       const options = {
         url: this.mergeConfig.remoteUrl,
-        params: JSON.parse(JSON.stringify(this.otherParams))
+        params: JSON.parse(JSON.stringify(this.otherParams)) 
       };
+      //设置请求头
+      if(this.mergeConfig.withAuthorization){
+        options.headers={
+          'Authorization': JSON.parse(window.localStorage.getItem('token')),
+        }
+      }
       options.params[
         this.mergeConfig.paramName
       ] = query;
-      agent.get(options.url)
-        .query(options.params)
-        .then(res=>{
-          let tempArr = this.mergeConfig.resField ? _get(res.body, this.mergeConfig.resField) : res.body;
-          _this.name=_get(tempArr,_this.mergeConfig.itemLabelField);
-          _this.modelVal=tempArr;
-        },err=>{
-          console.log(err.response);
-        })
+      axios(options).then(res => {
+        let tempArr = this.mergeConfig.resField ? _get(res.data, this.mergeConfig.resField) : res.data;
+        _this.name=_get(tempArr,_this.mergeConfig.itemLabelField);
+        _this.modelVal=tempArr;
+      },err=>{
+        console.log('error:',err);
+      });
     }
   }
 }
