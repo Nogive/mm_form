@@ -7,7 +7,7 @@
       type="text" 
       :readonly="readonly"
       placeholder="点击选择日期" 
-      @click="ToggleDatwPicker">
+      @click="ToggleDatePicker">
 
     <van-datetime-picker
       class="picker-box"
@@ -70,7 +70,7 @@ export default {
     this._setInitVal();
   },
   watch:{
-    dateVal(){
+    inputVal(){
       if(this.inputVal!=""){
         this.modelVal=Date.parse(new Date(this.dateVal));
       }
@@ -92,7 +92,7 @@ export default {
       }
     },
     onChange(picker){
-      this.inputVal=formatDate(this.dateVal,this.formmat);
+      //this.inputVal=formatDate(this.dateVal,this.formmat);
     },
     onConfirm(val){
       this.show=false;
@@ -103,7 +103,7 @@ export default {
       this.show=false;
       this.inputVal="";
     },
-    ToggleDatwPicker(){
+    ToggleDatePicker(){
       if(this.readonly){
         this.show=false;
       }else{

@@ -17,17 +17,20 @@
       <template v-if="isNormalObjSchema(dataItem.__dataSchema)">
         <ncform-object :schema="dataItem.__dataSchema" :form-data="formData" :idx-chain="(idxChain ? idxChain + ',' : '') + idx" :config="dataItem.__dataSchema.ui.widgetConfig" :show-legend="false">
 
-          <template v-for="(fieldSchema, fieldName) in (dataItem.__dataSchema.properties || {__notObjItem: dataItem.__dataSchema})" :slot="fieldName"><!-- 注意：__notObjItem 这个Key为与form-item约定好的值，其它名字不生效 -->
+          <template v-for="(fieldSchema, fieldName) in (dataItem.__dataSchema.properties || {__notObjItem: dataItem.__dataSchema})" :slot="fieldName">
             <slot :name="fieldName" :schema="fieldSchema" :idx="idx"></slot>
           </template>
 
         </ncform-object>
       </template>
+      
 
       <!-- array item 是 非正常的 object 类型 以及 其它类型 -->
       <div v-else class="normal-item">
-        <slot name="__notObjItem" :schema="dataItem.__dataSchema" :idx="idx"></slot> <!-- 注意：__notObjItem 和 __dataSchema 都是约定好的值，其它名字不生效 -->
+        <slot name="__notObjItem" :schema="dataItem.__dataSchema" :idx="idx"></slot>
       </div>
+
+      <!-- <ncform :form-schema="formSchema" :form-name="formSchemaaaa" v-model="formSchema.value" style="border:1px solid red"></ncform> -->
 
     </div>
 
@@ -106,7 +109,52 @@
     mixins: [layoutArrayMixin],
     data(){
       return {
-        
+        formSchema:{
+          type: 'object',
+          properties: {
+            xingming:{
+              type:'number',
+              ui:{
+                  label:'名称',
+                  readonly:'dx:{{$const.mode}}=="view"',
+                  widget:'mm-input',
+              },
+              rules: {
+                  required:true,
+              }
+            },
+            shuliang:{
+              type:'number',
+              ui:{
+                  label:'数量',
+                  readonly:'dx:{{$const.mode}}=="view"',
+                  widget:'mm-number',
+                  widgetConfig:{
+                  step:1,
+                  min:Number.NEGATIVE_INFINITY
+                  }
+              },
+              rules: {
+                  required:true,
+              }
+            },
+            jiage:{
+              type:'number',
+              ui:{
+                  label:'价格',
+                  readonly:'dx:{{$const.mode}}=="view"',
+                  widget:'mm-number',
+                  widgetConfig:{
+                  step:1,
+                  min:Number.NEGATIVE_INFINITY
+                  }
+              },
+              rules: {
+                  required:true,
+              }
+            },
+          }
+        }
       }
     },
     computed:{

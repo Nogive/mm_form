@@ -18,7 +18,11 @@ export default {
   data () {
     return {
       name:'',
-      tempVal:{}
+    }
+  },
+  created(){
+    if(this.value){
+      this.name=this.value.name;
     }
   },
   watch:{
@@ -26,14 +30,7 @@ export default {
       if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         this.remoteMethod();
       }
-    },
-    tempVal:{
-        handler(){
-            this.name=this.tempVal.name;
-            this.modelVal=this.tempVal;
-        },
-        deep:true
-    },
+    }
   },
   computed:{
     otherParams() {
@@ -49,8 +46,8 @@ export default {
       return modelVal;
     },
     remoteMethod(query){
-        let _this=this;
-        if(!_get(this.mergeConfig, 'remoteUrl')){ return; };
+      let _this=this;
+      if(!_get(this.mergeConfig, 'remoteUrl')){ return; };
       const options = {
         url: this.mergeConfig.remoteUrl,
         params: JSON.parse(JSON.stringify(this.otherParams)) 
@@ -66,18 +63,10 @@ export default {
       ] = query;
       axios(options).then(res => {
         let tempArr = this.mergeConfig.resField ? _get(res.data, this.mergeConfig.resField) : res.data;
-        console.log('data:',tempArr);
-        let temp=tempArr[0];
-        _this.name=temp[_this.mergeConfig.itemLabelField];
-        if(_this.value){
-            _this.tempVal.id=_this.value.id;
-        }
-        // _this.tempVal={
-        //     id:_this.value?_this.value.id:'',
-        //     name:temp[_this.mergeConfig.itemLabelField]
-        // };
+        _this.name=_get(tempArr,_this.mergeConfig.itemLabelField);
+        _this.modelVal=tempArr;
       },err=>{
-          console.log('error:',err);
+        console.log('error:',err);
       });
     }
   }
@@ -86,4 +75,6 @@ export default {
 <style scoped lang="stylus">
 .foreign
   padding 10px 0
+  .van-field
+    background-color #d8dce5
 </style>
