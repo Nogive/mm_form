@@ -3,7 +3,7 @@
     <div class="select-header" :class="{disabled:disabled}" @click="expandOptions" v-show="!hidden">
       <div class="mul-body" v-if="mergeConfig.multiple && selectedOptions.length>0">
         <span class="selected-item" v-for="(item,index) in selectedOptions" :key="index">{{item.label}}
-          <i class="clear" @click.stop="clearThisOption(item)"></i>
+          <i class="icon clear" @click.stop="clearThisOption(item)"></i>
         </span>
       </div>
       <div class="input-wrapper" v-show="showSearch">

@@ -8,9 +8,12 @@
         rows="1"
         autosize
         readonly
-        :icon="locationIcon"
-        @click-icon="onLocation"
-        @click="showMapContent"/>
+        @click="showMapContent">
+        <div slot="icon" class="icon-wrapper">
+          <van-icon v-if="!readonly&&locateBtn" name="location" @click.stop="onLocation"></van-icon>
+          <van-icon v-if="!readonly&&clearable" name="clear" @click.stop="clearLocation"></van-icon>
+        </div>
+      </van-field >
     </van-cell-group>
 
     <van-popup v-model="showMap" class="addr-box">
@@ -41,7 +44,7 @@
 </template>
 <script>
 import ncformCommon from '@ncform/ncform-common'
-import {onLocationByDing,onLocationByCordova} from "./utils"
+import {onLocationByDing,cLocation,dLocation} from "./utils"
 import AMap from 'AMap'
 import AMapUI from 'AMapUI'
 var map;
@@ -50,40 +53,47 @@ export default {
   data () {
     let _this=this;
     return {
-      showMap:false,
-      startSearch:false,
-      address:'',
-      center:[],
-      tipRes:[],
+      isLocate:false,//是否正在定位
+      clearable:false,//清除按钮
+      locateBtn:true,//定位按钮
+      center:[],//地图中心
+
+      showMap:false,//显示地图
+      startSearch:false,//开始搜索
+      address:'',//地址
+      lat:0,//纬度
+      lng:0,//精度
+      tipRes:[],//搜索  待选点
       defaultConfig:{
-        drag:false,
+        drag:false,//是否支持拖拽
       }
     }
   },
   mounted(){
-    this.address=this.value.address;
-    this.center=[this.value.lng,this.value.lat];
     this._initMap();
+    if(this.value){
+      this.address=this.value.address;
+      this.lng=this.value.lng;
+      this.lat=this.value.lat;
+    }
   },
   watch:{
-    center(){
-      if(this.center){
-        this.modelVal={
-          lng:this.center[0],
-          lat:this.center[1],
-          address:this.address
-        };
+    value(){
+      if(this.value){
+        this.address=this.value.address;
+        this.lng=this.value.lng;
+        this.lat=this.value.lat;
+      }
+    },
+    address(){
+      if(this.address&&this.address!=""){
+        this.clearable=true;
+      }else{
+        this.clearable=false;
       }
     }
   },
   computed:{
-    locationIcon:function(){
-      if(this.readonly){
-        return "";
-      }else{
-        return "location"
-      }
-    },
     drag(){
       return this._analyzeVal(this.config.drag);
     }
@@ -94,12 +104,16 @@ export default {
     },
     _initMap(){
       let _this=this;
+      if(this.lng==0||this.lat==0){
+        this.center=[121.473658,31.230378];//默认上海为中心
+      }else{
+        this.center=[this.lng,this.lat];
+      }
       map = new AMap.Map('mapContainer', {
-        center: this.center,
+        center:this.center,
         zoom: 15,
         dragEnable:this.drag
       });
-      //定位插件
       AMap.plugin('AMap.Geolocation', function() {
         var geolocation = new AMap.Geolocation({
           showButton:false,//是否显示定位按钮
@@ -110,37 +124,72 @@ export default {
         map.addControl(geolocation);
         _this.geolocation=geolocation;
       });
+      if(map.map){//地图初始化完成
+        _this.onDrag();
+      }
     },
     onLocation(){
+      this.locateBtn=false;
+      this.$toast('开始定位...');
+      this.isLocate=true;
       let _this=this;
-      if(window.dd &&(window.dd.android||window.dd.ios)){
-        onLocationByDing().then(res=>{
-          _this.address=res.address;
-          _this.center=[res.longitude,res.latitude];
+      if(window.dd &&(window.dd.android||window.dd.ios)){//钉钉
+        dLocation.onLocation(70).then(res=>{
+          console.log('endsuccess:',res);
+          _this.updateMapData(res);
+        },err=>{
+          if(err.err){
+            console.log('endErr:',err);
+          }
+           _this.$toast(err.message+'错误码：'+err.code);
+           _this.locateBtn=true;
+           _this.isLocate=false;
+        })
+      } else if(window.device){//cordova
+        cLocation.onLocation(70).then(res=>{
+          _this.updateMapData(res);
         },err=>{
           console.log(err);
         })
-      } else if(window.device){
-        onLocationByCordova().then(res=>{
-          _this.address=res.address;
-          _this.center=[res.longitude,res.latitude];
-        },err=>{
-          console.log(err);
-        })
-      }else{
+      }else{//高德
         this.onLocationByGaode();
       }
     },
     onLocationByGaode(){
       var _this=this;
       this.geolocation.getCurrentPosition(function(status,result){
+        _this.locateBtn=true;
+        _this.isLocate=false;
         if(status=='complete'){
-          _this.address=result.formattedAddress;
-          _this.center=[result.position.lng,result.position.lat];
+          _this.modelVal={
+            address:result.formattedAddress,
+            lng:result.position.lng,
+            lat:result.position.lat
+          };
         }else{
-          _this.$toast('定位失败，请稍后再试~')
+          _this.$toast('定位失败，请检查GPS是否打开，或到空旷的地方重新定位 错误码：3')
         }
       });
+    },
+    updateMapData(data){
+      this.modelVal={
+        address:data.address,
+        lng:data.longitude,
+        lat:data.latitude
+      };
+      map.setCenter([data.longitude,data.latitude]);
+      this.locateBtn=true;
+      this.isLocate=false;
+    },
+    showMapContent(){
+      if(this.isLocate){
+        this.$toast('系统正在进行定位，请稍候再试~');
+      }else{
+        this.showMap=true; 
+        this.$nextTick(()=>{
+          this._initMap(); 
+        })
+      }
     },
     onDrag(){
       let _this=this;
@@ -150,23 +199,17 @@ export default {
           map: map
         });
         positionPicker.on('success', function(positionResult) {
-          _this.address=positionResult.address;
-          _this.center=[positionResult.position.lng,positionResult.position.lat];
+          _this.modelVal={
+            address:positionResult.address,
+            lng:positionResult.position.lng,
+            lat:positionResult.position.lat
+          }
         });
         positionPicker.on('fail', function(positionResult) {
-          console.log('拖拽出现问题，请保证网络环境，稍后重试~');
+          console.log('拖拽出现问题，请保证网络环境，稍后重试~',positionResult);
         });
         positionPicker.start();
       });
-    },
-    showMapContent(){
-      if(this.address&&this.address!=""){
-        this.showMap=true;
-        this.$nextTick(()=>{
-          this._initMap();
-          this.onDrag();
-        })
-      }
     },
     onSearch(){
       let _this=this;
@@ -188,11 +231,20 @@ export default {
       })
     },
     selectRes(item){
-      this.address=item.name;
-      this.center=[item.location.lng,item.location.lat];
+      this.modelVal={
+        address:item.name,
+        lng:item.location.lng,
+        lat:item.location.lat
+      };
       this.startSearch=false;
-      this._initMap();
-      this.onDrag();
+      map.setCenter([item.location.lng,item.location.lat]);
+    },
+    clearLocation(){
+      this.modelVal={
+        address:'',
+        lng:0,
+        lat:0
+      };
     }
   }
 }
@@ -200,6 +252,17 @@ export default {
 <style scoped lang="stylus">
 .location
   padding 10px 0
+  .van-field
+    padding 10px 0 10px 15px
+    .icon-wrapper
+      width 65px
+      .van-icon
+        display inline-block
+        width 24px
+        font-size 24px
+        float right
+        &:first-child
+          margin-left 10px
   .addr-box
     width 100%
     padding 10px 0

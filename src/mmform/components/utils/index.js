@@ -1,8 +1,4 @@
 /**
- * func for Dingding
- */
-
-/**
  * 拍照上传
  * @param watermark 水印信息
  * @example watermark:{
@@ -29,8 +25,9 @@ export function takePhotoByDing(watermark) {
     });
   });
 }
+
 /**
- * 连续获取一组位置，返回精度最低的
+ * 返回期望精度的地理位置信息，若超时 则返回接近期望精度的位置信息
  * @return result {}
  * @example result:{
       longitude : Number,  经度
@@ -54,34 +51,69 @@ export function takePhotoByDing(watermark) {
       sceneId:string 定位场景ID
     }
  */
-export function onLocationByDing() {
+//自定义 定位失败错误码
+const errCode = {
+  default: 0,
+  noGps: 1,
+  timeout: 2
+};
+export function onLocationByDing(accuracy) {
+  console.log("prepare to location");
   var sceneId = "ding";
-  var results = [];
-  return new Promise((resolve, reject) => {
-    dd.device.geolocation.start({
-      targetAccuracy: 100, // 期望精确度
-      iOSDistanceFilter: 100, // 变更感知精度(iOS端参数)
-      useCache: true, // 是否使用缓存(Android端参数)
-      withReGeocode: true, // 是否返回逆地理信息,默认否
-      callBackInterval: 200, //回传时间间隔，ms
-      sceneId: sceneId, // 定位场景id,
-      onSuccess: function(result) {
-        if (results.length < 5) {
-          results.push(result);
-        } else {
-          stopDingLocate(result.sceneId);
-          results.sort((a, b) => {
-            return a - b;
-          });
-          resolve(results[0]);
+  var location;
+  return Promise.race([
+    new Promise((resolve, reject) => {
+      dd.device.geolocation.start({
+        targetAccuracy: 100, // 期望精确度
+        iOSDistanceFilter: 10, // 变更感知精度(iOS端参数)
+        useCache: true, // 是否使用缓存(Android端参数)
+        withReGeocode: true, // 是否返回逆地理信息,默认否
+        callBackInterval: 200, //回传时间间隔，ms
+        sceneId: sceneId, // 定位场景id,
+        onSuccess: function(result) {
+          console.log("location gotten,", result);
+          if (result.resultCode == 4) {
+            let e = new Error();
+            e.code = errCode.noGps;
+            e.message = "定位失败，请检查GPS是否打开，或到空旷的地方重新定位";
+            reject(e);
+          } else {
+            if (result.accuracy <= accuracy) {
+              stopDingLocate(result.sceneId);
+              resolve(result);
+            } else {
+              if (!location) {
+                location = result;
+              }
+              if (result.accuracy < location.accuracy) {
+                location = result;
+              }
+            }
+          }
+        },
+        onFail: function(err) {
+          let e = new Error();
+          e.code = errCode.default;
+          e.message = "定位失败，请检查GPS是否打开，或到空旷的地方重新定位";
+          e.err = err;
+          reject(e);
         }
-      },
-      onFail: function(err) {
-        reject(err);
-      }
-    });
-  });
+      });
+    }),
+    new Promise((resolve, reject) => {
+      var timer = null;
+      timer = setTimeout(function() {
+        if (location) {
+          stopDingLocate(sceneId);
+          resolve(location);
+        } else {
+          reject("timeout");
+        }
+      }, 15000);
+    })
+  ]);
 }
+//关闭连续定位
 function stopDingLocate(sceneId) {
   dd.device.geolocation.stop({
     sceneId: sceneId, // 需要停止定位场景id
@@ -91,6 +123,98 @@ function stopDingLocate(sceneId) {
     onFail: function(err) {}
   });
 }
+//钉钉定位获取地址
+export var dLocation = {
+  sceneId: "ding",
+  location: null,
+  onLocation: accuracy => {
+    let that = dLocation;
+    return Promise.race([that.startLocate(accuracy), that.locateTimeout()]);
+  },
+  startLocate: accuracy => {
+    let that = dLocation;
+    return new Promise((resolve, reject) => {
+      dd.device.geolocation.start({
+        targetAccuracy: 100, // 期望精确度
+        iOSDistanceFilter: 10, // 变更感知精度(iOS端参数)
+        useCache: true, // 是否使用缓存(Android端参数)
+        withReGeocode: true, // 是否返回逆地理信息,默认否
+        callBackInterval: 200, //回传时间间隔，ms
+        sceneId: that.sceneId, // 定位场景id,
+        onSuccess: function(result) {
+          console.log("location gotten,", result);
+          if (result.resultCode == 4) {
+            reject(
+              that.error(
+                errCode.noGps,
+                "定位失败，请检查GPS是否打开，或到空旷的地方重新定位"
+              )
+            );
+          } else {
+            if (result.accuracy <= accuracy) {
+              stopDingLocate(result.sceneId);
+              resolve(result);
+            } else {
+              if (!that.location) {
+                that.location = result;
+              }
+              if (result.accuracy < that.location.accuracy) {
+                that.location = result;
+              }
+            }
+          }
+        },
+        onFail: function(err) {
+          reject(
+            that.error(
+              errCode.default,
+              "定位失败，请检查GPS是否打开，或到空旷的地方重新定位",
+              err
+            )
+          );
+        }
+      });
+    });
+  },
+  locateTimeout: () => {
+    let that = dLocation;
+    return new Promise((resolve, reject) => {
+      var timer = null;
+      timer = setTimeout(function() {
+        if (that.location) {
+          stopDingLocate(that.sceneId);
+          resolve(that.location);
+        } else {
+          reject(
+            that.error(
+              errCode.timeout,
+              "定位超时,请检查网络或到空旷的位置重试。"
+            )
+          );
+        }
+      }, 15000);
+    });
+  },
+  stopLocate: () => {
+    let that = dLocation;
+    dd.device.geolocation.stop({
+      sceneId: that.sceneId,
+      onSuccess: function(result) {
+        //console.log("stop locate:", result); // 停止的定位场景id，当该场景没有开始定位时，返回null
+      },
+      onFail: function(err) {}
+    });
+  },
+  error: (code, msg, err) => {
+    let e = new Error();
+    e.code = code;
+    e.message = msg;
+    if (err) {
+      e.err = err;
+    }
+    return e;
+  }
+};
 /**---------------------------------------------Ding end-------------------------------------------- */
 
 /**
@@ -180,9 +304,82 @@ export function onLocationByCordova(interval) {
     );
   });
 }
-function stopCordovaLocate(sceneId) {
+function stopCordovaLocate() {
   cordova.exec(function() {}, function() {}, "Location", "stop", []);
 }
+
+export var cLocation = {
+  location: null,
+  onLocation: accuracy => {
+    let that = dLocation;
+    return Promise.race([that.startLocate(accuracy), that.locateTimeout()]);
+  },
+  startLocate: accuracy => {
+    let that = dLocation;
+    return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        cordova.exec(
+          result => {
+            if (result.accuracy <= accuracy) {
+              stopDingLocate();
+              resolve(result);
+            } else {
+              if (!that.location) {
+                that.location = result;
+              }
+              if (result.accuracy < that.location.accuracy) {
+                that.location = result;
+              }
+            }
+          },
+          err => {
+            reject(
+              that.error(
+                errCode.default,
+                "定位失败，请检查GPS是否打开，或到空旷的地方重新定位",
+                err
+              )
+            );
+          },
+          "Location",
+          "start",
+          [200]
+        ); //间隔200ms返回一组数据
+      });
+    });
+  },
+  locateTimeout: () => {
+    let that = dLocation;
+    return new Promise((resolve, reject) => {
+      var timer = null;
+      timer = setTimeout(function() {
+        if (that.location) {
+          stopDingLocate();
+          resolve(that.location);
+        } else {
+          reject(
+            that.error(
+              errCode.timeout,
+              "定位超时,请检查网络或到空旷的位置重试。"
+            )
+          );
+        }
+      }, 15000);
+    });
+  },
+  stopLocate: () => {
+    cordova.exec(function() {}, function() {}, "Location", "stop", []);
+  },
+  error: (code, msg, err) => {
+    let e = new Error();
+    e.code = code;
+    e.message = msg;
+    if (err) {
+      e.err = err;
+    }
+    return e;
+  }
+};
 /**---------------------------------------------cordova end-------------------------------------------- */
 
 //其他
