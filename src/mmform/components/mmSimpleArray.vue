@@ -1,7 +1,5 @@
 <template>
-
   <div class="__array-form-item space">
-
     <legend v-if="schema.ui.legend && schema.ui.showLegend" @click="collapse()">
       {{schema.ui.legend}}
       <i class="arrow" :class="{'pull-up': !mergeConfig.collapsed, 'pull-down': mergeConfig.collapsed}"></i>
@@ -9,29 +7,23 @@
 
     <div v-show="!mergeConfig.collapsed" v-for="(dataItem, idx) in schema.value" :key="dataItem.__dataSchema.__id" class="list-item">
       <div class="list-item-label">
-        <label class="title">{{dataItem.__dataSchema.ui.label}} {{idx + 1}}</label>
-        <van-icon v-if="!hiddenBtn" name="delete" @click="delItem(idx)" class="icon"></van-icon> 
+        <van-icon v-if="!hiddenBtn" name="clear" @click="delItem(idx)" class="icon"></van-icon> 
       </div>
-
       <!-- array item 是 正常的 object 类型 -->
       <template v-if="isNormalObjSchema(dataItem.__dataSchema)">
         <ncform-object :schema="dataItem.__dataSchema" :form-data="formData" :idx-chain="(idxChain ? idxChain + ',' : '') + idx" :config="dataItem.__dataSchema.ui.widgetConfig" :show-legend="false">
-
           <template v-for="(fieldSchema, fieldName) in (dataItem.__dataSchema.properties || {__notObjItem: dataItem.__dataSchema})" :slot="fieldName">
             <slot :name="fieldName" :schema="fieldSchema" :idx="idx"></slot>
           </template>
-
         </ncform-object>
       </template>
-      
-
       <!-- array item 是 非正常的 object 类型 以及 其它类型 -->
       <div v-else class="normal-item">
         <slot name="__notObjItem" :schema="dataItem.__dataSchema" :idx="idx"></slot>
       </div>
     </div>
 
-    <div v-show="!mergeConfig.collapsed" class="btn-group" v-if="!hiddenBtn">
+    <div class="btn-group" v-if="showBtns">
       <van-button @click="addItem()" plain type="primary" class="btn">
         <van-icon name="add-o"></van-icon>增加
       </van-button>
@@ -73,9 +65,9 @@
       margin: 0px 0px 8px
       padding 8px
       .list-item-label 
-        border-bottom 1px solid rgb(147,153,159)
-        padding-bottom 8px
-        margin 8px 0
+        border-bottom none
+        padding-bottom 0
+        margin 0
         .title 
           display inline-block
           margin-top 2px
@@ -99,19 +91,27 @@
 </style>
 
 <script>
-
+  import _cloneDeep from "lodash-es/cloneDeep";
   import ncformCommon from '@ncform/ncform-common';
   const layoutArrayMixin = ncformCommon.mixins.vue.layoutArrayMixin;
   export default {
     mixins: [layoutArrayMixin],
     data(){
       return {
+        showBtns:false,
       }
     },
     computed:{
       hiddenBtn(){
         return this._analyzeVal(this.schema.ui.readonly);//支持dx表达式
       }
+    },
+    created(){
+      let key=this.schema.ui.widgetConfig.quickItemField;
+      var values = ncformCommon.ncformUtils.getModelFromSchema(this.schema);
+      if(values[0][key] == -1){
+          this.schema.value=[];
+        }
     }
   }
 </script>
