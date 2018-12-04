@@ -3,12 +3,14 @@
     <legend v-if="schema.ui.legend && schema.ui.showLegend">
       {{schema.ui.legend}}
       <span class="btns">
-        <van-icon name="add-o" @click="openModel"></van-icon>
+        <span class="total" v-if="getFormDataFromSchema().length>0">{{getFormDataFromSchema().length}}</span>
+        <van-icon v-if="!hiddenBtn" v-show="getFormDataFromSchema().length>0" name="delete" @click="deleteALLItemInSchema()"></van-icon>
+        <van-icon v-if="!hiddenBtn" name="add-o" @click="openModel"></van-icon>
         <i class="arrow" :class="{'pull-up': !mergeConfig.collapsed, 'pull-down': mergeConfig.collapsed}" @click="collapse()"></i>
       </span>
     </legend>
 
-    <div v-if="!showQuickArray" v-show="!mergeConfig.collapsed" v-for="(dataItem, idx) in schema.value" :key="dataItem.__dataSchema.__id" class="list-item">
+    <div v-show="!mergeConfig.collapsed" v-for="(dataItem, idx) in schema.value" :key="dataItem.__dataSchema.__id" class="list-item">
       <div class="list-item-label">
         <label class="title">{{dataItem.__dataSchema.ui.label}} {{idx + 1}}</label>
         <van-icon v-if="!hiddenBtn" name="clear" @click="delItem(idx)" class="icon"></van-icon> 
@@ -26,7 +28,6 @@
       <div v-else class="normal-item">
         <slot name="__notObjItem" :schema="dataItem.__dataSchema" :idx="idx"></slot>
       </div>
-      <!-- <button @click="sendData">塞数据</button> -->
 
     </div>
 
@@ -57,9 +58,35 @@
                 left-icon="search"
                 placeholder="请输入关键字进行搜索"
               >
-                <van-button slot="button" size="small" type="primary">搜索</van-button>
+                <van-button slot="button" size="small" type="primary" @click="onSearch">搜索</van-button>
               </van-field>
             </van-cell-group>
+          </div>
+          <div class="content-form content-wrapper">
+            <div class="content" v-for="(item,index) in searchSkus" :key="index">
+              <div class="content-label">
+                <label class="title">{{item.name}}</label>
+                <div class="icons">
+                  <van-icon v-if="isShowCheckedBtn" name="passed" :class="{checked:item.checked}" @click="checkedItem(item)"></van-icon>
+                  <span v-else class="add-btns">
+                    <span class="total" v-show="isShowDeleteBtn(item)">{{item.value.skuKey.length}}</span>
+                    <van-icon v-show="isShowDeleteBtn(item)" name="delete" @click="deleteAllSchema(item)"></van-icon>
+                    <van-icon name="add-o" @click="createSchema(item)"></van-icon>
+                    <i class="arrow" v-if="!item.showChecked" :class="{'pull-up': !item.expandItem, 'pull-down': item.expandItem}" @click="item.expandItem=!item.expandItem"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="content-form" v-if="isShowDeleteBtn(item)" v-show="item.expandItem">
+                <ncform
+                  :form-schema="simpleSchema" 
+                  :form-name="`searchSchema_${item.id}`" 
+                  v-model="item.value">
+                </ncform>
+              </div>
+            </div>
+            <div v-show="noSearchResult" class="no-search-content">
+              暂无搜索结果 ~
+            </div>
           </div>
         </van-tab>
         <van-tab title="所有">
@@ -68,15 +95,17 @@
               <div class="content-label">
                 <label class="title">{{item.name}}</label>
                 <div class="icons">
-                  <van-icon v-if="!test" name="add-o" @click="createSchema(item)"></van-icon>
-                  <van-icon v-else name="passed" :class="{checked:item.checked}" @click="item.checked=!item.checked"></van-icon>
-                  <van-icon v-show="item.value.skuKey.length>0" name="delete" @click="deleteAllSchema(item)"></van-icon>
-                  <i class="arrow" :class="{'pull-up': !item.expandItem, 'pull-down': item.expandItem}" @click="item.expandItem=!item.expandItem"></i>
+                  <van-icon v-if="isShowCheckedBtn" name="passed" :class="{checked:item.checked}" @click="checkedItem(item)"></van-icon>
+                  <span v-else class="add-btns">
+                    <span class="total" v-show="isShowDeleteBtn(item)">{{item.value.skuKey.length}}</span>
+                    <van-icon v-show="isShowDeleteBtn(item)" name="delete" @click="deleteAllSchema(item)"></van-icon>
+                    <van-icon name="add-o" @click="createSchema(item)"></van-icon>
+                    <i class="arrow" v-if="!item.showChecked" :class="{'pull-up': !item.expandItem, 'pull-down': item.expandItem}" @click="item.expandItem=!item.expandItem"></i>
+                  </span>
                 </div>
               </div>
-              <div class="content-form" v-if="item.value.skuKey.length>0" v-show="item.expandItem">
+              <div class="content-form" v-if="isShowDeleteBtn(item)" v-show="item.expandItem">
                 <ncform
-                  :ref="`schema${item.id}`"
                   :form-schema="simpleSchema" 
                   :form-name="`schema${item.id}`"
                   v-model="item.value">
@@ -91,15 +120,17 @@
               <div class="content-label">
                 <label class="title">{{item.name}}</label>
                 <div class="icons">
-                  <van-icon v-if="!test" name="add-o" @click="createSchema(item)"></van-icon>
-                  <van-icon v-else name="passed" :class="{checked:item.checked}" @click="item.checked=!item.checked"></van-icon>
-                  <van-icon v-show="item.value.skuKey.length>0" name="delete" @click="deleteAllSchema(item)"></van-icon>
-                  <i class="arrow" :class="{'pull-up': !item.expandItem, 'pull-down': item.expandItem}" @click="item.expandItem=!item.expandItem"></i>
+                  <van-icon v-if="isShowCheckedBtn" name="passed" :class="{checked:item.checked}" @click="checkedItem(item)"></van-icon>
+                  <span v-else class="add-btns">
+                    <span class="total" v-show="isShowDeleteBtn(item)">{{item.value.skuKey.length}}</span>
+                    <van-icon v-show="isShowDeleteBtn(item)" name="delete" @click="deleteAllSchema(item)"></van-icon>
+                    <van-icon name="add-o" @click="createSchema(item)"></van-icon>
+                    <i class="arrow" v-if="!item.showChecked" :class="{'pull-up': !item.expandItem, 'pull-down': item.expandItem}" @click="item.expandItem=!item.expandItem"></i>
+                  </span>
                 </div>
               </div>
-              <div class="content-form" v-if="item.value.skuKey.length>0" v-show="item.expandItem">
+              <div class="content-form" v-if="isShowDeleteBtn(item)" v-show="item.expandItem">
                 <ncform
-                  :ref="`simpleSchema${item.id}`"
                   :form-schema="simpleSchema" 
                   :form-name="`groupSchema_${item.id}_${tab.key}`" 
                   v-model="item.value">
@@ -131,6 +162,11 @@
         position absolute
         right 6px
         bottom 0px
+        .total
+          font-weight bold
+          margin-right 8px
+          vertical-align top
+          color #38f
         .van-icon
           font-size 20px
           margin-right 8px
@@ -178,6 +214,12 @@
         padding 0.5rem 0
         .van-field
           padding 5px 0
+          .van-button
+            &:first-child
+              margin-right 8px
+        .no-search-content
+          text-align center
+          color #ccc
         .content
           border 1px solid rgba(0,0,0,.1)
           margin-bottom 10px
@@ -187,19 +229,24 @@
             padding 10px
             .icons
               float right
-            .van-icon
-              font-size 20px
-              margin-right 8px
-              &.checked
+              .total
+                margin-right 8px
+                font-weight bold
+                vertical-align top
                 color #38f
-            .arrow
-              display inline-block
-              width 20px
-              height 20px
-              &.pull-up
-                background url('./imgs/pullup.png')  center center no-repeat
-              &.pull-down
-                background url('./imgs/pulldown.png')  center center no-repeat 
+              .van-icon
+                font-size 20px
+                margin-right 8px
+                &.checked
+                  color #38f
+              .arrow
+                display inline-block
+                width 20px
+                height 20px
+                &.pull-up
+                  background url('./imgs/pullup.png')  center center no-repeat
+                &.pull-down
+                  background url('./imgs/pulldown.png')  center center no-repeat 
           .content-form
             padding 10px
             border-bottom 1px solid rgba(0,0,0,.5)
@@ -213,14 +260,11 @@
 
 <script>
   import {data} from "./data/mock"
-  import {getAttrCount} from "./utils"
-
   var superagent = require('superagent');
   import _get from "lodash-es/get";
   import _cloneDeep from "lodash-es/cloneDeep";
   import ncformCommon from '@ncform/ncform-common';
   const layoutArrayMixin = ncformCommon.mixins.vue.layoutArrayMixin;
-
   var skuMap=[];
   var groupMap=[];
   export default {
@@ -228,24 +272,21 @@
     data(){
       return {
         deleteAll:false,//删除全部按钮
-        showQuickArray:false,//显示父级的schema
-
         modelItemNum:1,//model里面的schema properties的个数
         groups:[],//选项卡
         skus:[],//sku,
         groupSkus:[],//每个目录对应的skus
-
-        expandItem:true,
+        searchSkus:[],//搜索结果
         active:1,//tab显示第几项
         openPopup:false,//模态框是否显示
         searchText:'',//搜索关键字
+        noSearchResult:false,//没有搜索结果
       }
     },
     created(){
-      this.initSimpleGroupMap();
-      this.initMap();
-      this.modelItemNum=getAttrCount(this.schema.items.properties);
+      this.modelItemNum=this.getAttrCount(this.schema.items.properties);//properties 属性个数
       this.setModelSchema(this.schema.items);
+      //若为系统默认值  则设置为空
       var values = this.getFormDataFromSchema();
       if(values[0][this.mergeConfig.quickItemField] == -1){
         this.schema.value=[];
@@ -254,13 +295,12 @@
     computed:{
       hiddenBtn(){
         return this._analyzeVal(this.schema.ui.readonly);
+      },
+      isShowCheckedBtn(){//是否显示选择按钮
+        return this.modelItemNum===1;
       }
     },
     methods:{
-      //获取formdata
-      getFormDataFromSchema(){
-        return ncformCommon.ncformUtils.getModelFromSchema(this.schema)
-      },
       //初始化modelschame
       setModelSchema(items){
         let newItems=_cloneDeep(items);
@@ -291,9 +331,21 @@
           }
         };
       },
+      //获取formdata
+      getFormDataFromSchema(){
+        return ncformCommon.ncformUtils.getModelFromSchema(this.schema)
+      },
+      //外层删除全部按钮
+      deleteALLItemInSchema(){
+        this.schema.value=[];
+      },
       //请求远程数据 并打开模态框
       openModel(){
         this.openPopup=true;
+        //远程请求
+        //请求结束后
+        this.initSimpleGroupMap();
+        this.initMap();
       },
       //远程请求
       remoteMethod(){
@@ -305,7 +357,7 @@
           url: this.mergeConfig.enumSourceRemote.remoteUrl,
           params: JSON.parse(JSON.stringify(this.otherParams))
         };
-        agent.get(options.url)
+        return agent.get(options.url)
           .query(options.params)
           .then(res=>{
             console.log(res);
@@ -313,11 +365,16 @@
       },
       //初始化map
       initMap(){
+        this.skus=[];
+        this.groups=[];
+        this.searchSkus=[];
+        this.groupSkus=[];
+        skuMap=[];
         data.forEach(item=>{
           let id=_get(item,this.mergeConfig.idField);
           let label=_get(item,this.mergeConfig.labelField);
           let value=this.initMapData(id);
-          let checked=this.modelItemNum>1?true:false;
+          let checked=this.isCheckedByData(id);
           let group=_get(item,this.mergeConfig.groupField);
           //sku map
           skuMap[id]={
@@ -346,6 +403,7 @@
       },
       //根据数据初始简单的groupMap  内含自定义id  和groupName 以id为key
       initSimpleGroupMap(){
+        groupMap=[];
         let tempGroups=[];
         data.forEach(item=>{
           let group=_get(item,this.mergeConfig.groupField);
@@ -385,6 +443,19 @@
           skuKey:result
         };
       },
+      isCheckedByData(id){
+        let data=this.getFormDataFromSchema();
+        let key=this.mergeConfig.quickItemField
+        if(this.modelItemNum===1){
+          if(data.length>0){
+            return data[0][key]==id;
+          }else{
+            return false;
+          }
+        }else{
+          return false;
+        }
+      },
       //点击tabs
       clickTab(index,title){
         if(index>1){
@@ -412,6 +483,17 @@
           skuKey:arr
         }
       },
+      //选中
+      checkedItem(item){
+        item.checked=!item.checked;
+        let v={[this.mergeConfig.quickItemField]:item.id};
+        let arr=[];
+        arr.push(v);
+        //设置value
+        item.value={
+          skuKey:arr
+        }
+      },
       //模态框里面 label上的删除
       deleteAllSchema(item){
         item.value.skuKey = [];
@@ -419,6 +501,7 @@
       //模态框确定
       onModelSure(){
         this.openPopup=false;
+        this.active=1;
         this.schema.value=[];
         this.skus.forEach(e=>{
           let skuKeys=e.value.skuKey;
@@ -426,6 +509,49 @@
             this.setValue(s);
           });
         });
+      },
+      //是否显示删除按钮
+      isShowDeleteBtn(item){
+        if(this.modelItemNum===1){
+          return false;
+        }else{
+          if(item.value.skuKey&&item.value.skuKey.length>0){
+            return true;
+          }else{
+            return false;
+          }
+        }
+      },
+      //点击搜索
+      onSearch(){
+        console.log(this.searchText);
+        var html='';
+        let searchResult=[];
+        if(this.searchText!=""){
+          this.skus.forEach(e=>{
+            let name=e.name;
+            if(name.includes(this.searchText)){
+              searchResult.push(e);
+            }
+          });
+          this.noSearchResult=searchResult.length==0;
+          this.searchSkus=searchResult;
+        }
+      },
+      //取消搜索
+      onCancle(){
+        this.noSearchResult=false;
+        this.searchSkus=[];
+      },
+      //获取某个对象中属性的个数
+      getAttrCount(obj){
+        var count = 0;
+        for (var i in obj) {
+          if (obj.hasOwnProperty(i)) {
+            count++;
+          }
+        }
+        return count;
       },
       //将模态框的数据塞到外层里面
       sendData(){
@@ -436,7 +562,6 @@
       setValue(obj){
         this.schema.value.push(obj);
         let idx = this.schema.value.length - 1;
-
         if (!this.schema.value[idx].__dataSchema) {
           const __dataSchema = _cloneDeep(this.schema.items);
           ncformCommon.ncformUtils.setValueToSchema(
@@ -446,7 +571,6 @@
           );
           this.$set(this.schema.value, idx, { __dataSchema });
         }
-
         if (!this.schema.value[idx].__dataSchema.__id) {
           this.schema.value[idx].__dataSchema.__id = Math.random();
         }
